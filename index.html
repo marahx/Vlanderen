@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0D0D12" media="(prefers-color-scheme:dark)">
+<meta name="theme-color" content="#F4F4F8" media="(prefers-color-scheme:light)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vlaams Leren">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Vlaams Leren">
+<meta name="description" content="Apprends le néerlandais belge — 500+ mots, 50 leçons, 40+ verbes conjugués">
+<title>Vlaams Leren 🇧🇪</title>
+
+<!-- PWA Manifest (inline) -->
+
+<link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlZsYWFtcyBMZXJlbiDwn4es4oCN8J+HqiIsCiAgInNob3J0X25hbWUiOiAiVmxhYW1zIiwKICAiZGVzY3JpcHRpb24iOiAiQXBwcmVuZHMgbGUgbsOpZXJsYW5kYWlzIGJlbGdlIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwRDBEMTIiLAogICJ0aGVtZV9jb2xvciI6ICIjRkY2QjM1IiwKICAib3JpZW50YXRpb24iOiAicG9ydHJhaXQiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSFpwWlhkQ2IzZzlJakFnTUNBeE1qZ2dNVEk0SWlCM2FXUjBhRDBpTVRJNElpQm9aV2xuYUhROUlqRXlPQ0krUEhKbFkzUWdkMmxrZEdnOUlqRXlPQ0lnYUdWcFoyaDBQU0l4TWpnaUlISjRQU0l5T0NJZ1ptbHNiRDBpSTBaR05rSXpOU0l2UGp4MFpYaDBJSGc5SWpZMElpQjVQU0kyTkNJZ1ptOXVkQzF6YVhwbFBTSTJOQ0lnWm1sc2JEMGlkMmhwZEdVaUlIUmxlSFF0WVc1amFHOXlQU0p0YVdSa2JHVWlJR1J2YldsdVlXNTBMV0poYzJWc2FXNWxQU0p0YVdSa2JHVWlQbk45cGw0OEwzUmxlSFErUEM5emRtYysiLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiLAogICAgICAicHVycG9zZSI6ICJhbnkgbWFza2FibGUiCiAgICB9CiAgXQp9">
+
+<!-- SVG Favicon -->
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇧🇪</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4IiB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCI+PHJlY3Qgd2lkdGg9IjEyOCIgaGVpZ2h0PSIxMjgiIHJ4PSIyOCIgZmlsbD0iI0ZGNkIzNSIvPjx0ZXh0IHg9IjY0IiB5PSI2NCIgZm9udC1zaXplPSI2NCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPvCfh6zigI3wn4eqPC90ZXh0Pjwvc3ZnPg==">
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<style>
+html,body{margin:0;padding:0;height:100%;overscroll-behavior:none}
+#root{min-height:100%}
+</style>
+
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useCallback, useMemo } = React;
+
+// ═══════════════════════════════════════════════════════════════════
+// 🇧🇪 VLAAMS LEREN v3 — Belgian Dutch Learning App
+// Galaxy S26 optimized · 500+ words · 50 lessons · Sentence builder focus
+// Audio = always optional (🔊 icon), never mandatory
+// ═══════════════════════════════════════════════════════════════════
+
+const speak = (text) => {
+if (!(‘speechSynthesis’ in window)) return;
+window.speechSynthesis.cancel();
+const u = new SpeechSynthesisUtterance(text);
+u.lang = ‘nl-BE’; u.rate = 0.82;
+const v = window.speechSynthesis.getVoices().find(v => v.lang.startsWith(‘nl’));
+if (v) u.voice = v;
+window.speechSynthesis.speak(u);
+};
+
+// Tiny speaker button component
+const Sp = ({text, color=”#FF6B35”}) => (
+<button onClick={(e)=>{e.stopPropagation();speak(text);}}
+style={{background:color+“18”,border:“none”,borderRadius:8,padding:“4px 10px”,color:color,fontSize:13,cursor:“pointer”,fontWeight:700,flexShrink:0}}
+aria-label=“Écouter”>🔊</button>
+);
+
+// ─── VOCABULARY DATABASE (500+) ─────────────────────────────────
+const W = [
+// A0: SURVIVAL (80)
+[“hallo”,“bonjour/salut”,“greet”,0],[“goedemorgen”,“bonjour (matin)”,“greet”,0],
+[“goedemiddag”,“bonjour (après-midi)”,“greet”,0],[“goedenavond”,“bonsoir”,“greet”,0],
+[“goedenacht”,“bonne nuit”,“greet”,0],[“tot ziens”,“au revoir”,“greet”,0],
+[“dag”,“salut/au revoir”,“greet”,0],[“dankjewel”,“merci (informel)”,“greet”,0],
+[“dank u wel”,“merci (formel)”,“greet”,0],[“alsjeblieft”,“s’il te plaît”,“greet”,0],
+[“alstublieft”,“s’il vous plaît”,“greet”,0],[“ja”,“oui”,“greet”,0],
+[“nee”,“non”,“greet”,0],[“neen”,“non (belge)”,“greet”,0],
+[“sorry”,“pardon/désolé”,“greet”,0],[“excuseer”,“excusez-moi”,“greet”,0],
+[“ik”,“je”,“pronoun”,0],[“jij”,“tu”,“pronoun”,0],[“u”,“vous (formel)”,“pronoun”,0],
+[“hij”,“il”,“pronoun”,0],[“zij”,“elle”,“pronoun”,0],[“het”,“il/elle (neutre)”,“pronoun”,0],
+[“wij”,“nous”,“pronoun”,0],[“jullie”,“vous (pluriel)”,“pronoun”,0],
+[“gij”,“tu (belge)”,“pronoun”,0],
+[“nul”,“zéro”,“number”,0],[“één”,“un”,“number”,0],[“twee”,“deux”,“number”,0],
+[“drie”,“trois”,“number”,0],[“vier”,“quatre”,“number”,0],[“vijf”,“cinq”,“number”,0],
+[“zes”,“six”,“number”,0],[“zeven”,“sept”,“number”,0],[“acht”,“huit”,“number”,0],
+[“negen”,“neuf”,“number”,0],[“tien”,“dix”,“number”,0],[“elf”,“onze”,“number”,0],
+[“twaalf”,“douze”,“number”,0],[“dertien”,“treize”,“number”,0],
+[“veertien”,“quatorze”,“number”,0],[“vijftien”,“quinze”,“number”,0],
+[“twintig”,“vingt”,“number”,0],[“dertig”,“trente”,“number”,0],
+[“veertig”,“quarante”,“number”,0],[“vijftig”,“cinquante”,“number”,0],
+[“zestig”,“soixante”,“number”,0],[“zeventig”,“septante”,“number”,0],
+[“tachtig”,“quatre-vingts”,“number”,0],[“negentig”,“nonante”,“number”,0],
+[“honderd”,“cent”,“number”,0],[“duizend”,“mille”,“number”,0],
+[“rood”,“rouge”,“color”,0],[“blauw”,“bleu”,“color”,0],[“groen”,“vert”,“color”,0],
+[“geel”,“jaune”,“color”,0],[“wit”,“blanc”,“color”,0],[“zwart”,“noir”,“color”,0],
+[“oranje”,“orange”,“color”,0],[“paars”,“violet”,“color”,0],[“roze”,“rose”,“color”,0],
+[“grijs”,“gris”,“color”,0],[“bruin”,“brun/marron”,“color”,0],
+[“maandag”,“lundi”,“day”,0],[“dinsdag”,“mardi”,“day”,0],[“woensdag”,“mercredi”,“day”,0],
+[“donderdag”,“jeudi”,“day”,0],[“vrijdag”,“vendredi”,“day”,0],
+[“zaterdag”,“samedi”,“day”,0],[“zondag”,“dimanche”,“day”,0],
+[“januari”,“janvier”,“month”,0],[“februari”,“février”,“month”,0],
+[“maart”,“mars”,“month”,0],[“april”,“avril”,“month”,0],[“mei”,“mai”,“month”,0],
+[“juni”,“juin”,“month”,0],[“juli”,“juillet”,“month”,0],[“augustus”,“août”,“month”,0],
+[“september”,“septembre”,“month”,0],[“oktober”,“octobre”,“month”,0],
+[“november”,“novembre”,“month”,0],[“december”,“décembre”,“month”,0],
+[“vandaag”,“aujourd’hui”,“time”,0],[“morgen”,“demain”,“time”,0],
+[“gisteren”,“hier”,“time”,0],[“nu”,“maintenant”,“time”,0],
+// A1: CORE (150)
+[“de vader”,“le père”,“family”,1],[“de moeder”,“la mère”,“family”,1],
+[“de ouders”,“les parents”,“family”,1],[“de zoon”,“le fils”,“family”,1],
+[“de dochter”,“la fille”,“family”,1],[“het kind”,“l’enfant”,“family”,1],
+[“de kinderen”,“les enfants”,“family”,1],[“de broer”,“le frère”,“family”,1],
+[“de zus”,“la sœur”,“family”,1],[“de opa”,“le grand-père”,“family”,1],
+[“de oma”,“la grand-mère”,“family”,1],[“de oom”,“l’oncle”,“family”,1],
+[“de tante”,“la tante”,“family”,1],[“de man”,“le mari/l’homme”,“family”,1],
+[“de vrouw”,“la femme/l’épouse”,“family”,1],[“de vriend”,“l’ami”,“family”,1],
+[“de vriendin”,“l’amie”,“family”,1],[“de baby”,“le bébé”,“family”,1],
+[“het brood”,“le pain”,“food”,1],[“de boter”,“le beurre”,“food”,1],
+[“de kaas”,“le fromage”,“food”,1],[“de melk”,“le lait”,“food”,1],
+[“het ei”,“l’œuf”,“food”,1],[“het vlees”,“la viande”,“food”,1],
+[“de vis”,“le poisson”,“food”,1],[“de aardappel”,“la pomme de terre”,“food”,1],
+[“de groenten”,“les légumes”,“food”,1],[“het fruit”,“les fruits”,“food”,1],
+[“de soep”,“la soupe”,“food”,1],[“de frieten”,“les frites”,“food”,1],
+[“de wafel”,“la gaufre”,“food”,1],[“de chocolade”,“le chocolat”,“food”,1],
+[“het water”,“l’eau”,“drink”,1],[“de koffie”,“le café”,“drink”,1],
+[“de thee”,“le thé”,“drink”,1],[“het bier”,“la bière”,“drink”,1],
+[“de wijn”,“le vin”,“drink”,1],[“het sap”,“le jus”,“drink”,1],
+[“het huis”,“la maison”,“house”,1],[“de keuken”,“la cuisine”,“house”,1],
+[“de woonkamer”,“le salon”,“house”,1],[“de slaapkamer”,“la chambre”,“house”,1],
+[“de badkamer”,“la salle de bain”,“house”,1],[“de tuin”,“le jardin”,“house”,1],
+[“de deur”,“la porte”,“house”,1],[“het raam”,“la fenêtre”,“house”,1],
+[“de tafel”,“la table”,“house”,1],[“de stoel”,“la chaise”,“house”,1],
+[“het bed”,“le lit”,“house”,1],[“de trap”,“l’escalier”,“house”,1],
+[“de kat”,“le chat”,“animal”,1],[“de hond”,“le chien”,“animal”,1],
+[“het paard”,“le cheval”,“animal”,1],[“de vogel”,“l’oiseau”,“animal”,1],
+[“de koe”,“la vache”,“animal”,1],[“het konijn”,“le lapin”,“animal”,1],
+[“de trein”,“le train”,“transport”,1],[“de bus”,“le bus”,“transport”,1],
+[“de tram”,“le tram”,“transport”,1],[“de auto”,“la voiture”,“transport”,1],
+[“de wagen”,“la voiture (belge)”,“transport”,1],[“de fiets”,“le vélo”,“transport”,1],
+[“het station”,“la gare”,“transport”,1],[“de halte”,“l’arrêt”,“transport”,1],
+[“links”,“à gauche”,“direction”,1],[“rechts”,“à droite”,“direction”,1],
+[“rechtdoor”,“tout droit”,“direction”,1],[“ver”,“loin”,“direction”,1],
+[“dichtbij”,“près”,“direction”,1],[“hier”,“ici”,“direction”,1],[“daar”,“là”,“direction”,1],
+[“groot”,“grand”,“adj”,1],[“klein”,“petit”,“adj”,1],[“oud”,“vieux”,“adj”,1],
+[“jong”,“jeune”,“adj”,1],[“mooi”,“beau”,“adj”,1],[“lelijk”,“laid”,“adj”,1],
+[“goed”,“bon/bien”,“adj”,1],[“slecht”,“mauvais”,“adj”,1],[“warm”,“chaud”,“adj”,1],
+[“koud”,“froid”,“adj”,1],[“nieuw”,“nouveau”,“adj”,1],[“duur”,“cher”,“adj”,1],
+[“goedkoop”,“bon marché”,“adj”,1],[“lekker”,“bon/délicieux”,“adj”,1],
+[“moe”,“fatigué”,“adj”,1],[“ziek”,“malade”,“adj”,1],[“blij”,“content”,“adj”,1],
+[“boos”,“fâché”,“adj”,1],[“bang”,“effrayé”,“adj”,1],[“leuk”,“chouette”,“adj”,1],
+[“zijn”,“être”,“verb”,1],[“hebben”,“avoir”,“verb”,1],[“gaan”,“aller”,“verb”,1],
+[“komen”,“venir”,“verb”,1],[“doen”,“faire”,“verb”,1],[“zeggen”,“dire”,“verb”,1],
+[“weten”,“savoir”,“verb”,1],[“willen”,“vouloir”,“verb”,1],[“kunnen”,“pouvoir”,“verb”,1],
+[“moeten”,“devoir”,“verb”,1],[“mogen”,“avoir le droit”,“verb”,1],
+[“werken”,“travailler”,“verb”,1],[“wonen”,“habiter”,“verb”,1],[“eten”,“manger”,“verb”,1],
+[“drinken”,“boire”,“verb”,1],[“slapen”,“dormir”,“verb”,1],[“lopen”,“marcher”,“verb”,1],
+[“rijden”,“conduire”,“verb”,1],[“lezen”,“lire”,“verb”,1],[“schrijven”,“écrire”,“verb”,1],
+[“spreken”,“parler”,“verb”,1],[“leren”,“apprendre”,“verb”,1],[“kopen”,“acheter”,“verb”,1],
+[“betalen”,“payer”,“verb”,1],[“maken”,“faire/fabriquer”,“verb”,1],
+[“beginnen”,“commencer”,“verb”,1],[“vinden”,“trouver”,“verb”,1],
+[“denken”,“penser”,“verb”,1],[“kijken”,“regarder”,“verb”,1],
+[“luisteren”,“écouter”,“verb”,1],[“helpen”,“aider”,“verb”,1],
+[“begrijpen”,“comprendre”,“verb”,1],[“herhalen”,“répéter”,“verb”,1],
+// A2 (150)
+[“de winkel”,“le magasin”,“shop”,2],[“de supermarkt”,“le supermarché”,“shop”,2],
+[“de bakker”,“la boulangerie”,“shop”,2],[“de slager”,“la boucherie”,“shop”,2],
+[“de apotheek”,“la pharmacie”,“shop”,2],[“de markt”,“le marché”,“shop”,2],
+[“de prijs”,“le prix”,“shop”,2],[“de korting”,“la réduction”,“shop”,2],
+[“de kassa”,“la caisse”,“shop”,2],[“het geld”,“l’argent”,“shop”,2],
+[“de rekening”,“l’addition/la facture”,“shop”,2],
+[“de dokter”,“le médecin”,“health”,2],[“het ziekenhuis”,“l’hôpital”,“health”,2],
+[“de pijn”,“la douleur”,“health”,2],[“hoofdpijn”,“mal de tête”,“health”,2],
+[“buikpijn”,“mal au ventre”,“health”,2],[“koorts”,“fièvre”,“health”,2],
+[“verkouden”,“enrhumé”,“health”,2],[“gezond”,“en bonne santé”,“health”,2],
+[“het recept”,“l’ordonnance”,“health”,2],[“de medicijnen”,“les médicaments”,“health”,2],
+[“het werk”,“le travail”,“work”,2],[“het kantoor”,“le bureau”,“work”,2],
+[“de vergadering”,“la réunion”,“work”,2],[“de collega”,“le/la collègue”,“work”,2],
+[“de baas”,“le patron”,“work”,2],[“het salaris”,“le salaire”,“work”,2],
+[“de pauze”,“la pause”,“work”,2],[“de vakantie”,“les vacances”,“work”,2],
+[“het contract”,“le contrat”,“work”,2],[“solliciteren”,“postuler”,“work”,2],
+[“druk”,“occupé”,“work”,2],[“de e-mail”,“l’e-mail”,“work”,2],
+[“de computer”,“l’ordinateur”,“work”,2],[“vergaderen”,“se réunir”,“work”,2],
+[“het weer”,“la météo”,“weather”,2],[“de zon”,“le soleil”,“weather”,2],
+[“de regen”,“la pluie”,“weather”,2],[“de wind”,“le vent”,“weather”,2],
+[“de sneeuw”,“la neige”,“weather”,2],[“de wolk”,“le nuage”,“weather”,2],
+[“het regent”,“il pleut”,“weather”,2],[“het sneeuwt”,“il neige”,“weather”,2],
+[“zonnig”,“ensoleillé”,“weather”,2],[“bewolkt”,“nuageux”,“weather”,2],
+[“sporten”,“faire du sport”,“hobby”,2],[“voetballen”,“jouer au foot”,“hobby”,2],
+[“fietsen”,“faire du vélo”,“hobby”,2],[“zwemmen”,“nager”,“hobby”,2],
+[“wandelen”,“se promener”,“hobby”,2],[“koken”,“cuisiner”,“hobby”,2],
+[“reizen”,“voyager”,“hobby”,2],[“uitgaan”,“sortir”,“hobby”,2],
+[“de bioscoop”,“le cinéma”,“hobby”,2],[“het museum”,“le musée”,“hobby”,2],
+[“het feest”,“la fête”,“hobby”,2],[“de verjaardag”,“l’anniversaire”,“hobby”,2],
+[“de gemeente”,“la commune”,“admin”,2],[“de identiteitskaart”,“la carte d’identité”,“admin”,2],
+[“het formulier”,“le formulaire”,“admin”,2],[“invullen”,“remplir”,“admin”,2],
+[“ondertekenen”,“signer”,“admin”,2],[“de handtekening”,“la signature”,“admin”,2],
+[“de afspraak”,“le rendez-vous”,“admin”,2],[“het adres”,“l’adresse”,“admin”,2],
+[“de straat”,“la rue”,“city”,2],[“het plein”,“la place”,“city”,2],
+[“de kerk”,“l’église”,“city”,2],[“het park”,“le parc”,“city”,2],
+[“de brug”,“le pont”,“city”,2],[“de school”,“l’école”,“city”,2],
+[“de universiteit”,“l’université”,“city”,2],[“het restaurant”,“le restaurant”,“city”,2],
+[“het café”,“le café/bar”,“city”,2],[“de bibliotheek”,“la bibliothèque”,“city”,2],
+[“het hoofd”,“la tête”,“body”,2],[“de arm”,“le bras”,“body”,2],
+[“het been”,“la jambe”,“body”,2],[“de hand”,“la main”,“body”,2],
+[“de voet”,“le pied”,“body”,2],[“de rug”,“le dos”,“body”,2],
+[“het oog”,“l’œil”,“body”,2],[“de mond”,“la bouche”,“body”,2],
+[“het oor”,“l’oreille”,“body”,2],[“de neus”,“le nez”,“body”,2],
+[“het haar”,“les cheveux”,“body”,2],[“de vinger”,“le doigt”,“body”,2],
+[“opstaan”,“se lever”,“daily”,2],[“ontbijten”,“petit-déjeuner”,“daily”,2],
+[“douchen”,“se doucher”,“daily”,2],[“aankleden”,“s’habiller”,“daily”,2],
+[“vertrekken”,“partir”,“daily”,2],[“aankomen”,“arriver”,“daily”,2],
+[“terugkomen”,“revenir”,“daily”,2],[“schoonmaken”,“nettoyer”,“daily”,2],
+[“boodschappen doen”,“faire les courses”,“daily”,2],
+[“de was doen”,“faire la lessive”,“daily”,2],
+[“strijken”,“repasser”,“daily”,2],[“afwassen”,“faire la vaisselle”,“daily”,2],
+// B1 (120+)
+[“eigenlijk”,“en fait”,“connect”,3],[“misschien”,“peut-être”,“connect”,3],
+[“waarschijnlijk”,“probablement”,“connect”,3],[“natuurlijk”,“bien sûr”,“connect”,3],
+[“trouwens”,“d’ailleurs”,“connect”,3],[“bovendien”,“de plus”,“connect”,3],
+[“daarom”,“c’est pourquoi”,“connect”,3],[“toch”,“quand même”,“connect”,3],
+[“zelfs”,“même”,“connect”,3],[“bijna”,“presque”,“connect”,3],
+[“ongeveer”,“environ”,“connect”,3],[“tenminste”,“au moins”,“connect”,3],
+[“eindelijk”,“enfin”,“connect”,3],[“plotseling”,“soudainement”,“connect”,3],
+[“ondertussen”,“entre-temps”,“connect”,3],[“hoewel”,“bien que”,“connect”,3],
+[“tenzij”,“à moins que”,“connect”,3],[“zodra”,“dès que”,“connect”,3],
+[“terwijl”,“pendant que”,“connect”,3],[“voordat”,“avant que”,“connect”,3],
+[“nadat”,“après que”,“connect”,3],[“aangezien”,“étant donné que”,“connect”,3],
+[“zich voelen”,“se sentir”,“emotion”,3],[“zich zorgen maken”,“s’inquiéter”,“emotion”,3],
+[“teleurgesteld”,“déçu”,“emotion”,3],[“opgewonden”,“excité”,“emotion”,3],
+[“trots”,“fier”,“emotion”,3],[“jaloers”,“jaloux”,“emotion”,3],
+[“geschokt”,“choqué”,“emotion”,3],[“opgelucht”,“soulagé”,“emotion”,3],
+[“verdrietig”,“triste”,“emotion”,3],[“gelukkig”,“heureux”,“emotion”,3],
+[“zenuwachtig”,“nerveux”,“emotion”,3],[“eenzaam”,“seul/solitaire”,“emotion”,3],
+[“de ervaring”,“l’expérience”,“abstract”,3],[“de mening”,“l’avis”,“abstract”,3],
+[“het voorstel”,“la proposition”,“abstract”,3],[“de reden”,“la raison”,“abstract”,3],
+[“het probleem”,“le problème”,“abstract”,3],[“de oplossing”,“la solution”,“abstract”,3],
+[“het verschil”,“la différence”,“abstract”,3],[“de kans”,“l’opportunité”,“abstract”,3],
+[“het doel”,“le but/objectif”,“abstract”,3],[“de betekenis”,“la signification”,“abstract”,3],
+[“het voorbeeld”,“l’exemple”,“abstract”,3],[“het gevolg”,“la conséquence”,“abstract”,3],
+[“het voordeel”,“l’avantage”,“abstract”,3],[“het nadeel”,“le désavantage”,“abstract”,3],
+[“bespreken”,“discuter”,“verbB1”,3],[“uitleggen”,“expliquer”,“verbB1”,3],
+[“vergelijken”,“comparer”,“verbB1”,3],[“beslissen”,“décider”,“verbB1”,3],
+[“voorstellen”,“proposer”,“verbB1”,3],[“zich herinneren”,“se souvenir”,“verbB1”,3],
+[“ontwikkelen”,“développer”,“verbB1”,3],[“verbeteren”,“améliorer”,“verbB1”,3],
+[“verwachten”,“s’attendre à”,“verbB1”,3],[“beschrijven”,“décrire”,“verbB1”,3],
+[“ontdekken”,“découvrir”,“verbB1”,3],[“bereiken”,“atteindre”,“verbB1”,3],
+[“verdienen”,“mériter/gagner”,“verbB1”,3],[“zich aanpassen”,“s’adapter”,“verbB1”,3],
+[“onderhandelen”,“négocier”,“verbB1”,3],[“overtuigen”,“convaincre”,“verbB1”,3],
+[“amai”,“oh là là (belge)”,“belgian”,3],[“goesting”,“envie (belge)”,“belgian”,3],
+[“plezant”,“agréable (belge)”,“belgian”,3],[“ambetant”,“embêtant (belge)”,“belgian”,3],
+[“content”,“content (belgicisme)”,“belgian”,3],[“zwansen”,“plaisanter (belge)”,“belgian”,3],
+[“een pintje”,“une petite bière”,“belgian”,3],[“schol”,“santé! (trinquer)”,“belgian”,3],
+[“komaan”,“allez viens!”,“belgian”,3],[“gezellig”,“convivial/chaleureux”,“belgian”,3],
+[“het pistolet”,“le petit pain (belge)”,“belgian”,3],[“de boterham”,“la tartine”,“belgian”,3],
+[“Brussel”,“Bruxelles”,“city_be”,3],[“Antwerpen”,“Anvers”,“city_be”,3],
+[“Gent”,“Gand”,“city_be”,3],[“Brugge”,“Bruges”,“city_be”,3],
+[“Leuven”,“Louvain”,“city_be”,3],[“Mechelen”,“Malines”,“city_be”,3],
+[“Vlaanderen”,“la Flandre”,“city_be”,3],[“Wallonië”,“la Wallonie”,“city_be”,3],
+];
+const VOCAB = W.map(([nl,fr,cat,lvl])=>({nl,fr,cat,lvl}));
+
+// ─── SENTENCE BANK (massive — used for build exercises) ─────────
+// [sentence, translation, level, distractor words]
+const SENTENCES = [
+// A0
+[“Hallo, hoe gaat het?”,“Bonjour, comment ça va?”,0,[“waar”,“niet”]],
+[“Goedemorgen, alles goed?”,“Bonjour, tout va bien?”,0,[“slecht”,“wanneer”]],
+[“Tot ziens!”,“Au revoir!”,0,[“hallo”,“morgen”]],
+[“Dank u wel!”,“Merci!”,0,[“sorry”,“nee”]],
+[“Ja, alstublieft.”,“Oui, s’il vous plaît.”,0,[“nee”,“niet”]],
+[“Nee, dankjewel.”,“Non, merci.”,0,[“ja”,“ook”]],
+[“Sorry, excuseer.”,“Pardon, excusez-moi.”,0,[“hallo”,“dag”]],
+[“Goedenacht!”,“Bonne nuit!”,0,[“morgen”,“dag”]],
+// A1
+[“Ik ben Thomas.”,“Je suis Thomas.”,1,[“hij”,“werkt”]],
+[“Hoe heet jij?”,“Comment tu t’appelles?”,1,[“waar”,“wat”]],
+[“Ik woon in Brussel.”,“J’habite à Bruxelles.”,1,[“werk”,“ga”]],
+[“Ik spreek een beetje Nederlands.”,“Je parle un peu néerlandais.”,1,[“goed”,“veel”]],
+[“Mijn broer heet Jan.”,“Mon frère s’appelle Jan.”,1,[“zus”,“vader”]],
+[“Ik heb twee katten.”,“J’ai deux chats.”,1,[“drie”,“honden”]],
+[“Hij werkt in Antwerpen.”,“Il travaille à Anvers.”,1,[“zij”,“woont”]],
+[“Wij zijn blij.”,“Nous sommes contents.”,1,[“moe”,“boos”]],
+[“Ik heb honger.”,“J’ai faim.”,1,[“dorst”,“slaap”]],
+[“Het is lekker!”,“C’est délicieux!”,1,[“slecht”,“duur”]],
+[“Waar is het station?”,“Où est la gare?”,1,[“hoe”,“wie”]],
+[“Ga rechtdoor.”,“Allez tout droit.”,1,[“links”,“rechts”]],
+[“Sla linksaf bij de kerk.”,“Tournez à gauche à l’église.”,1,[“rechtsaf”,“rechtdoor”]],
+[“De tuin is groot.”,“Le jardin est grand.”,1,[“klein”,“oud”]],
+[“Ik wil water, alsjeblieft.”,“Je veux de l’eau, s’il te plaît.”,1,[“bier”,“koffie”]],
+[“Zij leest een boek.”,“Elle lit un livre.”,1,[“hij”,“schrijft”]],
+[“Ik moet werken.”,“Je dois travailler.”,1,[“wil”,“kan”]],
+[“Mag ik een koffie?”,“Puis-je avoir un café?”,1,[“wil”,“moet”]],
+[“De kat slaapt op het bed.”,“Le chat dort sur le lit.”,1,[“hond”,“stoel”]],
+[“Het is koud vandaag.”,“Il fait froid aujourd’hui.”,1,[“warm”,“mooi”]],
+[“Ik kan Nederlands spreken.”,“Je sais parler néerlandais.”,1,[“wil”,“moet”]],
+[“Wij eten frieten.”,“Nous mangeons des frites.”,1,[“drinken”,“kopen”]],
+[“Jij bent mijn vriend.”,“Tu es mon ami.”,1,[“hij”,“haar”]],
+[“Ik ga naar de winkel.”,“Je vais au magasin.”,1,[“kom”,“werk”]],
+[“Waar woon jij?”,“Où habites-tu?”,1,[“werk”,“heet”]],
+[“Ik drink graag koffie.”,“J’aime boire du café.”,1,[“thee”,“bier”]],
+// A2
+[“Ik sta elke dag om zeven uur op.”,“Je me lève chaque jour à sept heures.”,2,[“werk”,“ga”]],
+[“De vergadering begint om tien uur.”,“La réunion commence à dix heures.”,2,[“eindigt”,“stopt”]],
+[“Hoeveel kost dat?”,“Combien ça coûte?”,2,[“is”,“heeft”]],
+[“Ik voel me niet lekker.”,“Je ne me sens pas bien.”,2,[“goed”,“blij”]],
+[“Ik heb pijn aan mijn rug.”,“J’ai mal au dos.”,2,[“hoofd”,“been”]],
+[“Het regent al drie dagen.”,“Il pleut depuis trois jours.”,2,[“sneeuwt”,“waait”]],
+[“Ik fiets graag in het park.”,“J’aime faire du vélo dans le parc.”,2,[“zwem”,“wandel”]],
+[“Morgen wordt het warm.”,“Demain il fera chaud.”,2,[“koud”,“regent”]],
+[“Ik heb gisteren hard gewerkt.”,“J’ai travaillé dur hier.”,2,[“vandaag”,“morgen”]],
+[“Wij zijn naar Brugge geweest.”,“Nous sommes allés à Bruges.”,2,[“Gent”,“Leuven”]],
+[“Vul het formulier in, alstublieft.”,“Remplissez le formulaire, s’il vous plaît.”,2,[“uit”,“op”]],
+[“De rekening, alstublieft.”,“L’addition, s’il vous plaît.”,2,[“menukaart”,“koffie”]],
+[“Ik werk als ingenieur.”,“Je travaille comme ingénieur.”,2,[“dokter”,“bakker”]],
+[“Mag ik de menukaart?”,“Puis-je avoir le menu?”,2,[“rekening”,“wijn”]],
+[“Ik moet boodschappen doen.”,“Je dois faire les courses.”,2,[“werken”,“slapen”]],
+[“Heb je een goed weekend gehad?”,“As-tu passé un bon week-end?”,2,[“slecht”,“druk”]],
+[“Ik heb het boek gelezen.”,“J’ai lu le livre.”,2,[“geschreven”,“gezien”]],
+[“Hij heeft een brief geschreven.”,“Il a écrit une lettre.”,2,[“gelezen”,“gemaakt”]],
+[“Ik ga morgen naar Antwerpen.”,“Je vais demain à Anvers.”,2,[“Gent”,“Brussel”]],
+[“De trein vertrekt om acht uur.”,“Le train part à huit heures.”,2,[“bus”,“tram”]],
+[“Stoofvlees met frieten, alstublieft.”,“Carbonnade avec frites, s’il vous plaît.”,2,[“soep”,“vis”]],
+[“Ik moet naar de dokter.”,“Je dois aller chez le médecin.”,2,[“bakker”,“school”]],
+[“Het was heerlijk!”,“C’était délicieux!”,2,[“slecht”,“duur”]],
+[“Nog iets anders?”,“Autre chose?”,2,[“Hoeveel”,“Wanneer”]],
+[“Dat is te duur.”,“C’est trop cher.”,2,[“goedkoop”,“mooi”]],
+// B1
+[“Ik vind dat hij gelijk heeft.”,“Je trouve qu’il a raison.”,3,[“zij”,“wij”]],
+[“Volgens mij is dat een goed idee.”,“Selon moi c’est une bonne idée.”,3,[“slecht”,“oud”]],
+[“Ik ben het daar niet mee eens.”,“Je ne suis pas d’accord.”,3,[“wel”,“ook”]],
+[“Hoewel het regent, ga ik wandelen.”,“Bien qu’il pleuve, je vais me promener.”,3,[“sneeuwt”,“waait”]],
+[“Ik voel me een beetje teleurgesteld.”,“Je me sens un peu déçu.”,3,[“blij”,“trots”]],
+[“Ik heb goesting in een pintje!”,“J’ai envie d’une petite bière!”,3,[“dorst”,“honger”]],
+[“Amai, wat leuk!”,“Oh là là, chouette!”,3,[“slecht”,“saai”]],
+[“Ik kijk ernaar uit!”,“J’ai hâte!”,3,[“niet”,“nog”]],
+[“Kunt u langzamer spreken?”,“Pouvez-vous parler plus lentement?”,3,[“sneller”,“harder”]],
+[“Ik begrijp het niet.”,“Je ne comprends pas.”,3,[“wel”,“goed”]],
+[“Hoe zeg je dat in het Nederlands?”,“Comment dit-on ça en néerlandais?”,3,[“Frans”,“Engels”]],
+[“Laten we het probleem bespreken.”,“Discutons du problème.”,3,[“oplossing”,“vraag”]],
+[“Ik ben trots op mezelf!”,“Je suis fier de moi!”,3,[“boos”,“bang”]],
+[“Dat is eigenlijk een goed voorstel.”,“C’est en fait une bonne proposition.”,3,[“slecht”,“oud”]],
+[“Ik herinner me dat niet meer.”,“Je ne m’en souviens plus.”,3,[“wel”,“goed”]],
+[“Kun je dat uitleggen?”,“Peux-tu expliquer ça?”,3,[“herhalen”,“vergeten”]],
+[“Het is heel gezellig hier.”,“C’est très convivial ici.”,3,[“saai”,“koud”]],
+[“Ik wil graag een afspraak maken.”,“Je voudrais prendre rendez-vous.”,3,[“kopen”,“betalen”]],
+[“Geen zorgen, het komt goed.”,“Ne t’inquiète pas, ça ira.”,3,[“slecht”,“niet”]],
+[“Oefening baart kunst!”,“C’est en forgeant qu’on devient forgeron!”,3,[“maakt”,“doet”]],
+];
+
+// ─── LESSONS ─────────────────────────────────────────────────────
+const LEVELS = [
+{id:“A0”,name:“Débutant absolu”,icon:“🌱”,color:”#FF6B35”,desc:“Premiers mots”},
+{id:“A1”,name:“Faux débutant”,icon:“📗”,color:”#4ECDC4”,desc:“Vocabulaire & bases”},
+{id:“A2”,name:“Élémentaire”,icon:“📘”,color:”#A78BFA”,desc:“Vie quotidienne”},
+{id:“B1”,name:“Intermédiaire”,icon:“📙”,color:”#F59E0B”,desc:“Conversations”},
+];
+
+// drills: build=sentence builder, mcq, fill, pair, conj, translate
+const LESSONS = [
+// ── A0 (10 leçons) ──
+{id:“L01”,lvl:“A0”,title:“Hallo!”,titleNl:“Begroetingen”,icon:“👋”,cats:[“greet”],
+grammar:“🇧🇪 En Belgique: ‘neen’ pour ‘non’, ‘amai!’ pour la surprise.”,
+drills:[
+{type:“build”,fr:“Bonjour, comment ça va?”,words:[“Hallo”,”,”,“hoe”,“gaat”,“het”,”?”],extra:[“waar”,“niet”]},
+{type:“build”,fr:“Au revoir!”,words:[“Tot”,“ziens”,”!”],extra:[“dag”,“morgen”]},
+{type:“build”,fr:“Merci!”,words:[“Dank”,“u”,“wel”,”!”],extra:[“sorry”,“hallo”]},
+{type:“mcq”,q:”‘Goedemorgen’ signifie :”,options:[“Bonsoir”,“Bonjour (matin)”,“Bonne nuit”,“Au revoir”],answer:1},
+{type:“mcq”,q:”‘Dankjewel’ est utilisé :”,options:[“En contexte formel”,“En contexte informel”,“Jamais”,“Seulement à l’écrit”],answer:1},
+{type:“fill”,sentence:“Goede_____ (bonsoir)”,answer:“navond”,hint:“soir”},
+{type:“build”,fr:“Oui, s’il vous plaît.”,words:[“Ja”,”,”,“alstublieft”,”.”],extra:[“nee”,“sorry”]},
+{type:“build”,fr:“Non, merci.”,words:[“Nee”,”,”,“dankjewel”,”.”],extra:[“ja”,“hallo”]},
+]},
+{id:“L02”,lvl:“A0”,title:“Se présenter”,titleNl:“Jezelf voorstellen”,icon:“🙋”,cats:[“greet”,“pronoun”],
+grammar:“3 façons: Ik ben…, Mijn naam is…, Ik heet… Le vouvoiement (u) est très utilisé en Belgique.”,
+drills:[
+{type:“build”,fr:“Je suis Thomas.”,words:[“Ik”,“ben”,“Thomas”,”.”],extra:[“hij”,“heet”]},
+{type:“build”,fr:“Comment tu t’appelles?”,words:[“Hoe”,“heet”,“jij”,”?”],extra:[“hij”,“wat”]},
+{type:“build”,fr:“J’habite à Bruxelles.”,words:[“Ik”,“woon”,“in”,“Brussel”,”.”],extra:[“werk”,“ga”]},
+{type:“build”,fr:“Je parle un peu néerlandais.”,words:[“Ik”,“spreek”,“een”,“beetje”,“Nederlands”,”.”],extra:[“goed”,“veel”]},
+{type:“mcq”,q:“Le pronom belge pour ‘tu’ est :”,options:[“jij”,“u”,“gij”,“hij”],answer:2},
+{type:“fill”,sentence:“Ik _____ uit België. (venir de)”,answer:“kom”,hint:“komen”},
+{type:“pair”,pairs:[[“ik”,“je”],[“jij”,“tu”],[“hij”,“il”],[“wij”,“nous”]]},
+{type:“build”,fr:“Enchanté!”,words:[“Aangenaam”,”!”],extra:[“Hallo”,“Dag”]},
+]},
+{id:“L03”,lvl:“A0”,title:“Compter 0-20”,titleNl:“Tellen 0-20”,icon:“🔢”,cats:[“number”],
+grammar:“Les nombres de 0 à 20 sont la base de tout. ‘Twee’ (2), ‘drie’ (3) sont fréquents partout.”,
+drills:[
+{type:“pair”,pairs:[[“één”,“1”],[“vijf”,“5”],[“tien”,“10”],[“twaalf”,“12”]]},
+{type:“mcq”,q:“Comment dit-on ‘7’ ?”,options:[“zes”,“zeven”,“acht”,“vijf”],answer:1},
+{type:“fill”,sentence:”_____ + drie = acht”,answer:“vijf”,hint:“5”},
+{type:“mcq”,q:”‘Veertien’ c’est :”,options:[“13”,“14”,“15”,“40”],answer:1},
+{type:“pair”,pairs:[[“elf”,“11”],[“dertien”,“13”],[“vijftien”,“15”],[“negentien”,“19”]]},
+{type:“fill”,sentence:“Tien + tien = _____”,answer:“twintig”,hint:“20”},
+]},
+{id:“L04”,lvl:“A0”,title:“Compter 20-1000”,titleNl:“Tellen 20-1000”,icon:“💯”,cats:[“number”],
+grammar:“🇧🇪 Nombres composés: unité AVANT dizaine ! 25=vijfentwintig. Zeventig(70), tachtig(80), negentig(90).”,
+drills:[
+{type:“mcq”,q:”‘Vijfentwintig’ c’est :”,options:[“15”,“25”,“35”,“52”],answer:1},
+{type:“mcq”,q:“Comment dit-on 42?”,options:[“viertig twee”,“tweeënveertig”,“veerentwee”],answer:1},
+{type:“fill”,sentence:“70 = _____”,answer:“zeventig”,hint:“septante”},
+{type:“fill”,sentence:“90 = _____”,answer:“negentig”,hint:“nonante”},
+{type:“pair”,pairs:[[“dertig”,“30”],[“vijftig”,“50”],[“tachtig”,“80”],[“honderd”,“100”]]},
+{type:“fill”,sentence:“1000 = _____”,answer:“duizend”,hint:“mille”},
+]},
+{id:“L05”,lvl:“A0”,title:“Les couleurs”,titleNl:“De kleuren”,icon:“🎨”,cats:[“color”],
+grammar:“Drapeau belge: zwart-geel-rood. Adj+e devant nom: de rode auto, het groene huis.”,
+drills:[
+{type:“pair”,pairs:[[“rood”,“rouge”],[“blauw”,“bleu”],[“groen”,“vert”],[“geel”,“jaune”]]},
+{type:“pair”,pairs:[[“zwart”,“noir”],[“wit”,“blanc”],[“oranje”,“orange”],[“paars”,“violet”]]},
+{type:“fill”,sentence:“De _____ auto (la voiture rouge)”,answer:“rode”,hint:“rood + e”},
+{type:“mcq”,q:“Le drapeau belge:”,options:[“rood-wit-blauw”,“zwart-geel-rood”,“blauw-geel-rood”],answer:1},
+{type:“build”,fr:“La maison est blanche.”,words:[“Het”,“huis”,“is”,“wit”,”.”],extra:[“zwart”,“rood”]},
+]},
+{id:“L06”,lvl:“A0”,title:“Les jours”,titleNl:“De dagen”,icon:“📅”,cats:[“day”],
+grammar:“En minuscule ! ‘Op maandag’ = le lundi. La semaine commence lundi en Belgique.”,
+drills:[
+{type:“pair”,pairs:[[“maandag”,“lundi”],[“woensdag”,“mercredi”],[“vrijdag”,“vendredi”],[“zondag”,“dimanche”]]},
+{type:“mcq”,q:”‘Donderdag’ c’est :”,options:[“mardi”,“mercredi”,“jeudi”,“vendredi”],answer:2},
+{type:“fill”,sentence:“Le weekend: _____ en zondag”,answer:“zaterdag”,hint:“samedi”},
+{type:“build”,fr:“Aujourd’hui c’est lundi.”,words:[“Vandaag”,“is”,“het”,“maandag”,”.”],extra:[“morgen”,“vrijdag”]},
+{type:“pair”,pairs:[[“dinsdag”,“mardi”],[“donderdag”,“jeudi”],[“zaterdag”,“samedi”]]},
+]},
+{id:“L07”,lvl:“A0”,title:“Les mois”,titleNl:“De maanden”,icon:“🗓️”,cats:[“month”],
+grammar:“Aussi en minuscule ! ‘In januari’ = en janvier. Beaucoup ressemblent au français.”,
+drills:[
+{type:“pair”,pairs:[[“januari”,“janvier”],[“maart”,“mars”],[“augustus”,“août”],[“december”,“décembre”]]},
+{type:“fill”,sentence:“Noël est en *****”,answer:“december”,hint:“décembre”},
+{type:“mcq”,q:”‘Oktober’ c’est :”,options:[“août”,“septembre”,“octobre”,“novembre”],answer:2},
+{type:“pair”,pairs:[[“februari”,“février”],[“mei”,“mai”],[“juli”,“juillet”],[“november”,“novembre”]]},
+{type:“build”,fr:“Mon anniversaire est en mars.”,words:[“Mijn”,“verjaardag”,“is”,“in”,“maart”,”.”],extra:[“juni”,“op”]},
+]},
+{id:“L08”,lvl:“A0”,title:“Le temps & l’heure”,titleNl:“Tijd”,icon:“⏰”,cats:[“time”],
+grammar:“vandaag=aujourd’hui, morgen=demain, gisteren=hier. ‘Hoe laat is het?’ = Quelle heure?”,
+drills:[
+{type:“pair”,pairs:[[“vandaag”,“aujourd’hui”],[“morgen”,“demain”],[“gisteren”,“hier”],[“nu”,“maintenant”]]},
+{type:“build”,fr:“Aujourd’hui c’est mercredi.”,words:[“Vandaag”,“is”,“het”,“woensdag”,”.”],extra:[“morgen”,“was”]},
+{type:“fill”,sentence:”***** is het maandag. (aujourd’hui)”,answer:“Vandaag”,hint:“aujourd’hui”},
+{type:“mcq”,q:”‘Gisteren’ signifie :”,options:[“demain”,“aujourd’hui”,“hier”,“maintenant”],answer:2},
+{type:“build”,fr:“Demain je vais à Gand.”,words:[“Morgen”,“ga”,“ik”,“naar”,“Gent”,”.”],extra:[“vandaag”,“Brussel”]},
+]},
+{id:“L09”,lvl:“A0”,title:“Mots essentiels”,titleNl:“Belangrijke woorden”,icon:“⭐”,cats:[“greet”,“pronoun”],
+grammar:“Quelques phrases clés pour survivre partout: oui/non, s’il vous plaît, pardon, je ne comprends pas.”,
+drills:[
+{type:“build”,fr:“Je ne comprends pas.”,words:[“Ik”,“begrijp”,“het”,“niet”,”.”],extra:[“wel”,“goed”]},
+{type:“build”,fr:“Pouvez-vous répéter?”,words:[“Kunt”,“u”,“dat”,“herhalen”,”?”],extra:[“zeggen”,“doen”]},
+{type:“build”,fr:“Parlez-vous français?”,words:[“Spreekt”,“u”,“Frans”,”?”],extra:[“Nederlands”,“Engels”]},
+{type:“mcq”,q:”‘Excuseer’ signifie :”,options:[“Merci”,“Excusez-moi”,“Bonjour”,“Non”],answer:1},
+{type:“fill”,sentence:“Ik _____ het niet. (comprendre)”,answer:“begrijp”,hint:“begrijpen”},
+]},
+{id:“L10”,lvl:“A0”,title:“Révision A0 🏆”,titleNl:“Herhaling A0”,icon:“🏆”,cats:[“greet”,“pronoun”,“number”,“color”,“day”,“month”,“time”],
+grammar:“Tu connais maintenant les bases ! 80+ mots, salutations, nombres, couleurs, jours, mois.”,
+drills:[
+{type:“build”,fr:“Bonjour, je suis Thomas.”,words:[“Hallo”,”,”,“ik”,“ben”,“Thomas”,”.”],extra:[“hij”,“heet”]},
+{type:“build”,fr:“Au revoir, à demain!”,words:[“Tot”,“ziens”,”,”,“tot”,“morgen”,”!”],extra:[“dag”,“gisteren”]},
+{type:“pair”,pairs:[[“rood”,“rouge”],[“vrijdag”,“vendredi”],[“acht”,“huit”],[“morgen”,“demain”]]},
+{type:“mcq”,q:“Le pronom belge familier :”,options:[“u”,“gij”,“hij”,“wij”],answer:1},
+{type:“fill”,sentence:“70 = _____”,answer:“zeventig”,hint:“septante”},
+{type:“build”,fr:“Non merci, au revoir.”,words:[“Nee”,”,”,“dankjewel”,”.”,“Tot”,“ziens”,”!”],extra:[“ja”,“hallo”]},
+{type:“mcq”,q:”‘Goedenacht’ signifie :”,options:[“Bonjour”,“Bonsoir”,“Bonne nuit”,“Au revoir”],answer:2},
+]},
+// ── A1 (15 leçons) ──
+{id:“L11”,lvl:“A1”,title:“La famille”,titleNl:“De familie”,icon:“👨‍👩‍👧‍👦”,cats:[“family”],
+grammar:“de (≈75%) vs het (≈25%). Pluriel = toujours ‘de’. 🇧🇪 ‘bomma/bompa’ = grand-mère/père.”,
+drills:[
+{type:“pair”,pairs:[[“de vader”,“le père”],[“de moeder”,“la mère”],[“de broer”,“le frère”],[“de zus”,“la sœur”]]},
+{type:“build”,fr:“Mon frère s’appelle Jan.”,words:[“Mijn”,“broer”,“heet”,“Jan”,”.”],extra:[“zus”,“vader”]},
+{type:“mcq”,q:“Article de ‘kind’ (enfant)?”,options:[“de”,“het”],answer:1},
+{type:“fill”,sentence:“De _____ zijn thuis. (enfants)”,answer:“kinderen”,hint:“kind → pluriel”},
+{type:“build”,fr:“J’ai deux sœurs.”,words:[“Ik”,“heb”,“twee”,“zussen”,”.”],extra:[“broers”,“drie”]},
+{type:“pair”,pairs:[[“de opa”,“le grand-père”],[“de oma”,“la grand-mère”],[“de oom”,“l’oncle”],[“de tante”,“la tante”]]},
+]},
+{id:“L12”,lvl:“A1”,title:“Manger & boire”,titleNl:“Eten en drinken”,icon:“🍽️”,cats:[“food”,“drink”],
+grammar:“Ik heb honger=J’ai faim. Ik heb dorst=J’ai soif. 🇧🇪 ‘pintje’=bière, ‘frieten’=frites (pas ‘patat’).”,
+drills:[
+{type:“pair”,pairs:[[“het brood”,“le pain”],[“de kaas”,“le fromage”],[“de frieten”,“les frites”],[“het bier”,“la bière”]]},
+{type:“build”,fr:“J’ai faim!”,words:[“Ik”,“heb”,“honger”,”!”],extra:[“dorst”,“slaap”]},
+{type:“build”,fr:“C’est délicieux!”,words:[“Het”,“is”,“lekker”,”!”],extra:[“slecht”,“duur”]},
+{type:“fill”,sentence:“Een kopje _____, alstublieft.”,answer:“koffie”,hint:“café”},
+{type:“mcq”,q:“En Belgique, une bière:”,options:[“een biertje”,“een pintje”,“een glas”],answer:1},
+{type:“build”,fr:“Nous mangeons des frites.”,words:[“Wij”,“eten”,“frieten”,”.”],extra:[“drinken”,“soep”]},
+{type:“build”,fr:“Je veux de l’eau, s’il te plaît.”,words:[“Ik”,“wil”,“water”,”,”,“alsjeblieft”,”.”],extra:[“bier”,“koffie”]},
+]},
+{id:“L13”,lvl:“A1”,title:“La maison”,titleNl:“Het huis”,icon:“🏡”,cats:[“house”],
+grammar:“Verbes séparables: opstaan→Ik sta om 7 uur op. 🇧🇪 ‘living’ et ‘frigo’ courants en Belgique.”,
+drills:[
+{type:“pair”,pairs:[[“de keuken”,“la cuisine”],[“de slaapkamer”,“la chambre”],[“de tuin”,“le jardin”],[“het raam”,“la fenêtre”]]},
+{type:“build”,fr:“Le jardin est grand.”,words:[“De”,“tuin”,“is”,“groot”,”.”],extra:[“klein”,“mooi”]},
+{type:“build”,fr:“Le chat dort sur le lit.”,words:[“De”,“kat”,“slaapt”,“op”,“het”,“bed”,”.”],extra:[“hond”,“stoel”]},
+{type:“mcq”,q:“Article de ‘huis’:”,options:[“de”,“het”],answer:1},
+{type:“fill”,sentence:“De _____ is klein. (cuisine)”,answer:“keuken”,hint:“cuisine”},
+{type:“build”,fr:“Je me lève à 7 heures.”,words:[“Ik”,“sta”,“om”,“zeven”,“uur”,“op”,”.”],extra:[“werk”,“ga”]},
+]},
+{id:“L14”,lvl:“A1”,title:“Les animaux”,titleNl:“De dieren”,icon:“🐾”,cats:[“animal”],
+grammar:“de kat, de hond, het paard, de vogel, de koe, het konijn. Pluriels: -en ou -s.”,
+drills:[
+{type:“pair”,pairs:[[“de kat”,“le chat”],[“de hond”,“le chien”],[“het paard”,“le cheval”],[“de vogel”,“l’oiseau”]]},
+{type:“build”,fr:“J’ai deux chats.”,words:[“Ik”,“heb”,“twee”,“katten”,”.”],extra:[“honden”,“drie”]},
+{type:“mcq”,q:“Article de ‘konijn’ (lapin):”,options:[“de”,“het”],answer:1},
+{type:“fill”,sentence:“De _____ geeft melk. (vache)”,answer:“koe”,hint:“vache”},
+{type:“build”,fr:“Le chien est dans le jardin.”,words:[“De”,“hond”,“is”,“in”,“de”,“tuin”,”.”],extra:[“kat”,“huis”]},
+]},
+{id:“L15”,lvl:“A1”,title:“Transports”,titleNl:“Vervoer”,icon:“🚆”,cats:[“transport”,“direction”],
+grammar:“🇧🇪 ‘wagen’ pour voiture. NMBS=trains. De Lijn=bus/trams Flandre. STIB=Bruxelles.”,
+drills:[
+{type:“pair”,pairs:[[“de trein”,“le train”],[“de fiets”,“le vélo”],[“de wagen”,“la voiture”],[“het station”,“la gare”]]},
+{type:“build”,fr:“Où est la gare?”,words:[“Waar”,“is”,“het”,“station”,”?”],extra:[“hoe”,“wat”]},
+{type:“build”,fr:“Allez tout droit puis à gauche.”,words:[“Ga”,“rechtdoor”,“en”,“dan”,“linksaf”,”.”],extra:[“rechtsaf”,“hier”]},
+{type:“fill”,sentence:“Ik neem de _____ naar Gent.”,answer:“trein”,hint:“train”},
+{type:“build”,fr:“Tournez à gauche à l’église.”,words:[“Sla”,“linksaf”,“bij”,“de”,“kerk”,”.”],extra:[“rechtsaf”,“brug”]},
+{type:“mcq”,q:”‘Overstappen’ signifie:”,options:[“monter”,“descendre”,“changer”,“attendre”],answer:2},
+]},
+{id:“L16”,lvl:“A1”,title:“Adjectifs”,titleNl:“Bijvoeglijke naamwoorden”,icon:“📝”,cats:[“adj”],
+grammar:“groot/klein, oud/jong, mooi/lelijk. + e devant nom: de grote man. MAIS: een groot huis (een+het→pas de e).”,
+drills:[
+{type:“pair”,pairs:[[“groot”,“grand”],[“klein”,“petit”],[“mooi”,“beau”],[“warm”,“chaud”]]},
+{type:“pair”,pairs:[[“moe”,“fatigué”],[“ziek”,“malade”],[“blij”,“content”],[“boos”,“fâché”]]},
+{type:“build”,fr:“Il fait froid aujourd’hui.”,words:[“Het”,“is”,“koud”,“vandaag”,”.”],extra:[“warm”,“mooi”]},
+{type:“mcq”,q:“Le contraire de ‘oud’:”,options:[“groot”,“klein”,“jong”,“nieuw”],answer:2},
+{type:“fill”,sentence:“Een _____ huis (une grande maison)”,answer:“groot”,hint:“grand, sans -e car een+het”},
+{type:“build”,fr:“Je suis fatigué.”,words:[“Ik”,“ben”,“moe”,”.”],extra:[“blij”,“ziek”]},
+]},
+{id:“L17”,lvl:“A1”,title:“Être & Avoir”,titleNl:“Zijn en hebben”,icon:“🔑”,cats:[“verb”],
+grammar:“ZIJN: ik ben, jij bent, hij is, wij zijn. HEBBEN: ik heb, jij hebt, hij heeft, wij hebben. 🇧🇪 gij zijt, gij hebt.”,
+drills:[
+{type:“conj”,verb:“zijn”,forms:{ik:“ben”,jij:“bent”,“hij/zij”:“is”,“gij 🇧🇪”:“zijt”,wij:“zijn”}},
+{type:“conj”,verb:“hebben”,forms:{ik:“heb”,jij:“hebt”,“hij/zij”:“heeft”,wij:“hebben”}},
+{type:“build”,fr:“Nous sommes contents.”,words:[“Wij”,“zijn”,“blij”,”.”],extra:[“moe”,“ben”]},
+{type:“build”,fr:“Il a une voiture.”,words:[“Hij”,“heeft”,“een”,“auto”,”.”],extra:[“heb”,“is”]},
+{type:“fill”,sentence:“Ik _____ moe. (être)”,answer:“ben”,hint:“zijn 1ère pers.”},
+{type:“mcq”,q:“En belge: ‘Gij ___ laat!’”,options:[“bent”,“zijt”,“is”,“zijn”],answer:1},
+]},
+{id:“L18”,lvl:“A1”,title:“Le présent”,titleNl:“Tegenwoordige tijd”,icon:“⏰”,cats:[“verb”],
+grammar:“Radical (infinitif-en) + terminaison: ik werk, jij werkt, wij werken. Inversion jij: -t disparaît! Werk jij?”,
+drills:[
+{type:“conj”,verb:“werken”,forms:{ik:“werk”,jij:“werkt”,“hij/zij”:“werkt”,wij:“werken”}},
+{type:“conj”,verb:“wonen”,forms:{ik:“woon”,jij:“woont”,“hij/zij”:“woont”,wij:“wonen”}},
+{type:“build”,fr:“Il travaille à Anvers.”,words:[“Hij”,“werkt”,“in”,“Antwerpen”,”.”],extra:[“zij”,“woont”]},
+{type:“mcq”,q:“Inversion: ‘jij werkt’ →”,options:[“Werkt jij?”,“Werk jij?”,“Werken jij?”],answer:1},
+{type:“fill”,sentence:“Zij _____ Nederlands. (parler)”,answer:“spreekt”,hint:“spreken 3ème”},
+{type:“build”,fr:“Où habites-tu?”,words:[“Waar”,“woon”,“jij”,”?”],extra:[“werk”,“heet”]},
+]},
+{id:“L19”,lvl:“A1”,title:“Verbes modaux”,titleNl:“Modale werkwoorden”,icon:“💪”,cats:[“verb”],
+grammar:“willen (vouloir), kunnen (pouvoir), moeten (devoir), mogen (droit). 2ème verbe = infinitif à la FIN!”,
+drills:[
+{type:“pair”,pairs:[[“willen”,“vouloir”],[“kunnen”,“pouvoir”],[“moeten”,“devoir”],[“mogen”,“avoir le droit”]]},
+{type:“build”,fr:“Je dois travailler.”,words:[“Ik”,“moet”,“werken”,”.”],extra:[“wil”,“kan”]},
+{type:“build”,fr:“Puis-je avoir un café?”,words:[“Mag”,“ik”,“een”,“koffie”,”?”],extra:[“wil”,“moet”]},
+{type:“build”,fr:“Je sais parler néerlandais.”,words:[“Ik”,“kan”,“Nederlands”,“spreken”,”.”],extra:[“wil”,“moet”]},
+{type:“fill”,sentence:“Ik _____ graag een thee. (vouloir)”,answer:“wil”,hint:“willen 1ère”},
+{type:“mcq”,q:”‘Mag ik?’ signifie:”,options:[“Je dois?”,“Je veux?”,“Puis-je?”,“Je sais?”],answer:2},
+]},
+{id:“L20”,lvl:“A1”,title:“Verbes d’action”,titleNl:“Actiewerkwoorden”,icon:“⚡”,cats:[“verb”],
+grammar:“eten, drinken, lezen, schrijven, lopen, kijken, luisteren. Tous réguliers au présent sauf quelques-uns.”,
+drills:[
+{type:“pair”,pairs:[[“eten”,“manger”],[“drinken”,“boire”],[“lezen”,“lire”],[“schrijven”,“écrire”]]},
+{type:“build”,fr:“Elle lit un livre.”,words:[“Zij”,“leest”,“een”,“boek”,”.”],extra:[“hij”,“schrijft”]},
+{type:“build”,fr:“J’aime boire du café.”,words:[“Ik”,“drink”,“graag”,“koffie”,”.”],extra:[“thee”,“eet”]},
+{type:“fill”,sentence:“Ik _____ een boek. (lire)”,answer:“lees”,hint:“lezen 1ère”},
+{type:“mcq”,q:”‘Luisteren’ signifie:”,options:[“regarder”,“écouter”,“parler”,“écrire”],answer:1},
+{type:“build”,fr:“Il mange une pomme.”,words:[“Hij”,“eet”,“een”,“appel”,”.”],extra:[“zij”,“drinkt”]},
+]},
+{id:“L21”,lvl:“A1”,title:“L’ordre des mots”,titleNl:“Woordvolgorde”,icon:“🔄”,cats:[“verb”],
+grammar:“RÈGLE V2: verbe conjugué TOUJOURS en 2ème position! ‘Morgen GA ik…’ Subordonnées: verbe à la FIN!”,
+drills:[
+{type:“build”,fr:“Demain je vais à Gand.”,words:[“Morgen”,“ga”,“ik”,“naar”,“Gent”,”.”],extra:[“vandaag”,“Brussel”]},
+{type:“build”,fr:“Aujourd’hui je travaille à la maison.”,words:[“Vandaag”,“werk”,“ik”,“thuis”,”.”],extra:[“morgen”,“kantoor”]},
+{type:“build”,fr:“Je ne parle pas bien néerlandais.”,words:[“Ik”,“spreek”,“niet”,“goed”,“Nederlands”,”.”],extra:[“wel”,“Frans”]},
+{type:“mcq”,q:“Quel ordre est correct?”,options:[“Morgen ik ga”,“Morgen ga ik”,“Ik morgen ga”],answer:1},
+{type:“fill”,sentence:“Ik weet dat hij in Gent _____.”,answer:“woont”,hint:“wonen, fin de subord.”},
+{type:“build”,fr:“Je sais qu’il habite à Bruges.”,words:[“Ik”,“weet”,“dat”,“hij”,“in”,“Brugge”,“woont”,”.”],extra:[“Gent”,“werkt”]},
+]},
+{id:“L22”,lvl:“A1”,title:“Au restaurant”,titleNl:“In het restaurant”,icon:“🍴”,cats:[“food”,“drink”],
+grammar:“Mag ik de menukaart? Ik wil graag bestellen. De rekening, alstublieft. Het was heerlijk!”,
+drills:[
+{type:“build”,fr:“Puis-je avoir le menu?”,words:[“Mag”,“ik”,“de”,“menukaart”,”?”],extra:[“rekening”,“wil”]},
+{type:“build”,fr:“Carbonnade avec frites, s’il vous plaît.”,words:[“Stoofvlees”,“met”,“frieten”,”,”,“alstublieft”,”.”],extra:[“soep”,“vis”]},
+{type:“build”,fr:“L’addition, s’il vous plaît.”,words:[“De”,“rekening”,”,”,“alstublieft”,”.”],extra:[“menukaart”,“koffie”]},
+{type:“build”,fr:“C’était délicieux!”,words:[“Het”,“was”,“heerlijk”,”!”],extra:[“lekker”,“slecht”]},
+{type:“fill”,sentence:“Ik wil graag _____. (commander)”,answer:“bestellen”,hint:“commander”},
+{type:“pair”,pairs:[[“het voorgerecht”,“l’entrée”],[“het hoofdgerecht”,“le plat”],[“het nagerecht”,“le dessert”],[“de rekening”,“l’addition”]]},
+]},
+{id:“L23”,lvl:“A1”,title:“Faire les courses”,titleNl:“Boodschappen doen”,icon:“🛒”,cats:[“food”,“drink”],
+grammar:“Hoeveel kost dat? Nog iets anders? Dat is alles. 🇧🇪 ‘pistolet’=petit pain belge.”,
+drills:[
+{type:“build”,fr:“Combien ça coûte?”,words:[“Hoeveel”,“kost”,“dat”,”?”],extra:[“is”,“heeft”]},
+{type:“build”,fr:“C’est trop cher.”,words:[“Dat”,“is”,“te”,“duur”,”.”],extra:[“goedkoop”,“mooi”]},
+{type:“build”,fr:“Autre chose?”,words:[“Nog”,“iets”,“anders”,”?”],extra:[“Hoeveel”,“Wanneer”]},
+{type:“fill”,sentence:“Vier _____, alstublieft. (petits pains belges)”,answer:“pistolets”,hint:“pistolet pluriel”},
+{type:“mcq”,q:”‘Goedkoop’ signifie:”,options:[“Cher”,“Bon marché”,“Gratuit”,“Beau”],answer:1},
+{type:“build”,fr:“Un pain gris et quatre petits pains.”,words:[“Een”,“grijs”,“brood”,“en”,“vier”,“pistolets”,”.”],extra:[“wit”,“twee”]},
+]},
+{id:“L24”,lvl:“A1”,title:“Les directions”,titleNl:“De weg vragen”,icon:“🧭”,cats:[“transport”,“direction”],
+grammar:“Ga rechtdoor, sla linksaf, sla rechtsaf. Het is niet ver. Het is vijf minuten lopen.”,
+drills:[
+{type:“build”,fr:“Ce n’est pas loin.”,words:[“Het”,“is”,“niet”,“ver”,”.”],extra:[“dichtbij”,“hier”]},
+{type:“build”,fr:“C’est à cinq minutes à pied.”,words:[“Het”,“is”,“vijf”,“minuten”,“lopen”,”.”],extra:[“tien”,“rijden”]},
+{type:“build”,fr:“Tournez à droite au pont.”,words:[“Sla”,“rechtsaf”,“bij”,“de”,“brug”,”.”],extra:[“linksaf”,“kerk”]},
+{type:“fill”,sentence:“Ga _____ en dan rechtsaf.”,answer:“rechtdoor”,hint:“tout droit”},
+{type:“pair”,pairs:[[“links”,“à gauche”],[“rechts”,“à droite”],[“rechtdoor”,“tout droit”],[“dichtbij”,“près”]]},
+]},
+{id:“L25”,lvl:“A1”,title:“Révision A1 🏆”,titleNl:“Herhaling A1”,icon:“🏆”,cats:[“family”,“food”,“drink”,“house”,“animal”,“transport”,“direction”,“adj”,“verb”],
+grammar:“Tu maîtrises 200+ mots, les verbes au présent, les modaux, et l’ordre V2!”,
+drills:[
+{type:“build”,fr:“Mon frère travaille à Anvers.”,words:[“Mijn”,“broer”,“werkt”,“in”,“Antwerpen”,”.”],extra:[“zus”,“Gent”]},
+{type:“build”,fr:“Je vais au magasin à vélo.”,words:[“Ik”,“ga”,“naar”,“de”,“winkel”,“met”,“de”,“fiets”,”.”],extra:[“trein”,“auto”]},
+{type:“pair”,pairs:[[“de frieten”,“les frites”],[“moe”,“fatigué”],[“de keuken”,“la cuisine”],[“het bier”,“la bière”]]},
+{type:“fill”,sentence:“Wij _____ blij. (être)”,answer:“zijn”,hint:“zijn”},
+{type:“build”,fr:“Demain je dois travailler.”,words:[“Morgen”,“moet”,“ik”,“werken”,”.”],extra:[“wil”,“kan”]},
+{type:“conj”,verb:“spreken”,forms:{ik:“spreek”,jij:“spreekt”,“hij/zij”:“spreekt”,wij:“spreken”}},
+{type:“build”,fr:“Je sais qu’elle habite à Bruges.”,words:[“Ik”,“weet”,“dat”,“zij”,“in”,“Brugge”,“woont”,”.”],extra:[“hij”,“Gent”]},
+]},
+// ── A2 (15 leçons) ──
+{id:“L26”,lvl:“A2”,title:“Le corps”,titleNl:“Het lichaam”,icon:“🦶”,cats:[“body”],
+grammar:“Ik heb pijn aan mijn… + partie du corps. Composés: hoofd+pijn=hoofdpijn.”,
+drills:[
+{type:“pair”,pairs:[[“het hoofd”,“la tête”],[“de hand”,“la main”],[“de voet”,“le pied”],[“de rug”,“le dos”]]},
+{type:“build”,fr:“J’ai mal au dos.”,words:[“Ik”,“heb”,“pijn”,“aan”,“mijn”,“rug”,”.”],extra:[“hoofd”,“been”]},
+{type:“build”,fr:“J’ai mal à la tête.”,words:[“Ik”,“heb”,“hoofdpijn”,”.”],extra:[“buikpijn”,“koorts”]},
+{type:“fill”,sentence:“Mijn _____ doet pijn. (œil)”,answer:“oog”,hint:“het oog”},
+{type:“pair”,pairs:[[“het oor”,“l’oreille”],[“de neus”,“le nez”],[“het been”,“la jambe”],[“de arm”,“le bras”]]},
+]},
+{id:“L27”,lvl:“A2”,title:“Chez le médecin”,titleNl:“Bij de dokter”,icon:“🏥”,cats:[“health”],
+grammar:“Ik voel me niet lekker. Ik moet naar de dokter. 🇧🇪 ‘huisarts’=médecin généraliste. ‘mutualiteit’=mutuelle.”,
+drills:[
+{type:“build”,fr:“Je ne me sens pas bien.”,words:[“Ik”,“voel”,“me”,“niet”,“lekker”,”.”],extra:[“goed”,“blij”]},
+{type:“build”,fr:“Je dois aller chez le médecin.”,words:[“Ik”,“moet”,“naar”,“de”,“dokter”,”.”],extra:[“bakker”,“school”]},
+{type:“fill”,sentence:“Ik heb al drie dagen _____.”,answer:“koorts”,hint:“fièvre”},
+{type:“mcq”,q:”‘Het recept’ c’est:”,options:[“la recette”,“l’ordonnance”,“le reçu”],answer:1},
+{type:“build”,fr:“Je suis enrhumé depuis lundi.”,words:[“Ik”,“ben”,“verkouden”,“sinds”,“maandag”,”.”],extra:[“ziek”,“dinsdag”]},
+{type:“pair”,pairs:[[“de dokter”,“le médecin”],[“hoofdpijn”,“mal de tête”],[“koorts”,“fièvre”],[“de medicijnen”,“les médicaments”]]},
+]},
+{id:“L28”,lvl:“A2”,title:“Au travail”,titleNl:“Op het werk”,icon:“💼”,cats:[“work”],
+grammar:“🇧🇪 Beaucoup de mots du français: bureau, chef, collega. ‘Druk’ = occupé.”,
+drills:[
+{type:“pair”,pairs:[[“het kantoor”,“le bureau”],[“de vergadering”,“la réunion”],[“de collega”,“le collègue”],[“het salaris”,“le salaire”]]},
+{type:“build”,fr:“La réunion commence à dix heures.”,words:[“De”,“vergadering”,“begint”,“om”,“tien”,“uur”,”.”],extra:[“eindigt”,“acht”]},
+{type:“build”,fr:“Je travaille comme ingénieur.”,words:[“Ik”,“werk”,“als”,“ingenieur”,”.”],extra:[“dokter”,“bakker”]},
+{type:“fill”,sentence:“Ik heb een _____ om 10 uur.”,answer:“vergadering”,hint:“réunion”},
+{type:“mcq”,q:”‘Solliciteren’ signifie:”,options:[“travailler”,“postuler”,“démissionner”],answer:1},
+]},
+{id:“L29”,lvl:“A2”,title:“La météo”,titleNl:“Het weer”,icon:“🌤️”,cats:[“weather”],
+grammar:”‘Het’ impersonnel: Het regent, Het is warm. 🇧🇪 Sujet #1 de conversation!”,
+drills:[
+{type:“pair”,pairs:[[“de zon”,“le soleil”],[“de regen”,“la pluie”],[“de sneeuw”,“la neige”],[“de wind”,“le vent”]]},
+{type:“build”,fr:“Il pleut depuis trois jours.”,words:[“Het”,“regent”,“al”,“drie”,“dagen”,”.”],extra:[“sneeuwt”,“twee”]},
+{type:“build”,fr:“Demain il fera chaud.”,words:[“Morgen”,“wordt”,“het”,“warm”,”.”],extra:[“koud”,“regent”]},
+{type:“fill”,sentence:“Het _____ vandaag. (neiger)”,answer:“sneeuwt”,hint:“il neige”},
+{type:“mcq”,q:”‘Bewolkt’ signifie:”,options:[“ensoleillé”,“nuageux”,“venteux”],answer:1},
+]},
+{id:“L30”,lvl:“A2”,title:“Hobbies”,titleNl:“Hobby’s”,icon:“⚽”,cats:[“hobby”],
+grammar:”‘Graag’ = aimer faire: Ik fiets graag. ‘Houden van’ = aimer: Ik hou van muziek.”,
+drills:[
+{type:“pair”,pairs:[[“fietsen”,“vélo”],[“zwemmen”,“nager”],[“wandelen”,“se promener”],[“koken”,“cuisiner”]]},
+{type:“build”,fr:“J’aime faire du vélo dans le parc.”,words:[“Ik”,“fiets”,“graag”,“in”,“het”,“park”,”.”],extra:[“zwem”,“tuin”]},
+{type:“build”,fr:“Que fais-tu dans ton temps libre?”,words:[“Wat”,“doe”,“je”,“graag”,“in”,“je”,“vrije”,“tijd”,”?”],extra:[“mijn”,“werk”]},
+{type:“fill”,sentence:“Ik hou _____ muziek.”,answer:“van”,hint:“aimer (houden van)”},
+{type:“mcq”,q:”‘Uitgaan’ signifie:”,options:[“entrer”,“sortir”,“dormir”],answer:1},
+]},
+{id:“L31”,lvl:“A2”,title:“La ville”,titleNl:“De stad”,icon:“🏙️”,cats:[“city”],
+grammar:“in de straat, op het plein, bij de kerk, naar de school. Prépositions de lieu.”,
+drills:[
+{type:“pair”,pairs:[[“de straat”,“la rue”],[“het park”,“le parc”],[“de kerk”,“l’église”],[“de brug”,“le pont”]]},
+{type:“build”,fr:“Le café est sur la place.”,words:[“Het”,“café”,“is”,“op”,“het”,“plein”,”.”],extra:[“in”,“straat”]},
+{type:“build”,fr:“Je vais à l’école.”,words:[“Ik”,“ga”,“naar”,“de”,“school”,”.”],extra:[“kom”,“kerk”]},
+{type:“fill”,sentence:“De _____ is vlakbij. (bibliothèque)”,answer:“bibliotheek”,hint:“bibliothèque”},
+{type:“mcq”,q:“Article de ‘restaurant’:”,options:[“de”,“het”],answer:1},
+]},
+{id:“L32”,lvl:“A2”,title:“Routine”,titleNl:“Dagelijkse routine”,icon:“🔁”,cats:[“daily”],
+grammar:“Verbes séparables: opstaan, aankomen, terugkomen. Le préfixe se sépare!”,
+drills:[
+{type:“build”,fr:“Je me lève à sept heures.”,words:[“Ik”,“sta”,“om”,“zeven”,“uur”,“op”,”.”],extra:[“werk”,“ga”]},
+{type:“build”,fr:“Je rentre à 18h.”,words:[“Ik”,“kom”,“om”,“18”,“uur”,“thuis”,”.”],extra:[“werk”,“ga”]},
+{type:“build”,fr:“Je dois faire les courses.”,words:[“Ik”,“moet”,“boodschappen”,“doen”,”.”],extra:[“werken”,“slapen”]},
+{type:“pair”,pairs:[[“opstaan”,“se lever”],[“ontbijten”,“petit-déj.”],[“douchen”,“se doucher”],[“vertrekken”,“partir”]]},
+{type:“fill”,sentence:“Ik sta om 7 uur _____.”,answer:“op”,hint:“préfixe ‘opstaan’”},
+{type:“mcq”,q:”‘Afwassen’ signifie:”,options:[“se laver”,“faire la vaisselle”,“cuisiner”],answer:1},
+]},
+{id:“L33”,lvl:“A2”,title:“L’administratif”,titleNl:“Administratie”,icon:“📋”,cats:[“admin”],
+grammar:“🇧🇪 En Flandre = tout en néerlandais. Bruxelles = bilingue. Vocabulaire de la commune.”,
+drills:[
+{type:“pair”,pairs:[[“de gemeente”,“la commune”],[“het formulier”,“le formulaire”],[“invullen”,“remplir”],[“ondertekenen”,“signer”]]},
+{type:“build”,fr:“Remplissez le formulaire.”,words:[“Vul”,“het”,“formulier”,“in”,”,”,“alstublieft”,”.”],extra:[“uit”,“op”]},
+{type:“build”,fr:“Je voudrais prendre rendez-vous.”,words:[“Ik”,“wil”,“graag”,“een”,“afspraak”,“maken”,”.”],extra:[“kopen”,“betalen”]},
+{type:“fill”,sentence:“Wat is uw _____? (adresse)”,answer:“adres”,hint:“adresse”},
+{type:“mcq”,q:”‘De identiteitskaart’ c’est:”,options:[“le passeport”,“le permis”,“la carte d’identité”],answer:2},
+]},
+{id:“L34”,lvl:“A2”,title:“Le passé composé”,titleNl:“Voltooid tegenwoordige tijd”,icon:“⏪”,cats:[“verb”],
+grammar:“hebben/zijn + voltooid deelwoord. Régulier: ge+radical+t/d → gewerkt, geleerd. Irrégulier: geweest, gegaan.”,
+drills:[
+{type:“build”,fr:“J’ai travaillé dur hier.”,words:[“Ik”,“heb”,“gisteren”,“hard”,“gewerkt”,”.”],extra:[“vandaag”,“morgen”]},
+{type:“build”,fr:“Nous sommes allés à Bruges.”,words:[“Wij”,“zijn”,“naar”,“Brugge”,“geweest”,”.”],extra:[“Gent”,“gegaan”]},
+{type:“fill”,sentence:“Ik heb het boek _____. (lire, passé)”,answer:“gelezen”,hint:“participe de lezen”},
+{type:“pair”,pairs:[[“gewerkt”,“travaillé”],[“gegeten”,“mangé”],[“geweest”,“été”],[“geschreven”,“écrit”]]},
+{type:“build”,fr:“Il a écrit une lettre.”,words:[“Hij”,“heeft”,“een”,“brief”,“geschreven”,”.”],extra:[“gelezen”,“gemaakt”]},
+{type:“mcq”,q:“Participe de ‘drinken’:”,options:[“gedrinkt”,“gedronken”,“gedrunken”],answer:1},
+]},
+{id:“L35”,lvl:“A2”,title:“Le futur”,titleNl:“De toekomst”,icon:“🔮”,cats:[“verb”],
+grammar:”‘Gaan’+inf (oral) ou ‘zullen’+inf (formel). Ik ga morgen werken. Het zal regenen.”,
+drills:[
+{type:“build”,fr:“Je vais travailler demain.”,words:[“Ik”,“ga”,“morgen”,“werken”,”.”],extra:[“wil”,“moet”]},
+{type:“build”,fr:“Il pleuvra demain.”,words:[“Het”,“zal”,“morgen”,“regenen”,”.”],extra:[“gaat”,“moet”]},
+{type:“fill”,sentence:“Wij _____ je helpen. (futur formel)”,answer:“zullen”,hint:“zullen”},
+{type:“mcq”,q:”‘Zullen we gaan?’ signifie:”,options:[“Devons-nous?”,“On y va?”,“Pouvons-nous?”],answer:1},
+{type:“build”,fr:“On va discuter du problème.”,words:[“We”,“gaan”,“het”,“probleem”,“bespreken”,”.”],extra:[“moeten”,“willen”]},
+]},
+{id:“L36”,lvl:“A2”,title:“Comparatifs”,titleNl:“Vergelijkingen”,icon:“⚖️”,cats:[“adj”],
+grammar:“Comparatif: +er (+ dan). groot→groter. Superlatif: +st. grootst. Irréguliers: goed→beter→best.”,
+drills:[
+{type:“fill”,sentence:“Brussel is _____ dan Gent. (grand)”,answer:“groter”,hint:“groot+er”},
+{type:“build”,fr:“Cette bière est meilleure.”,words:[“Dit”,“bier”,“is”,“beter”,”.”],extra:[“goeder”,“best”]},
+{type:“mcq”,q:“Comparatif de ‘goed’:”,options:[“goeder”,“beter”,“best”],answer:1},
+{type:“pair”,pairs:[[“groter”,“plus grand”],[“kleiner”,“plus petit”],[“beter”,“meilleur”],[“warmer”,“plus chaud”]]},
+{type:“fill”,sentence:“Dit is de _____ stad. (beau, superlatif)”,answer:“mooiste”,hint:“mooi+ste”},
+]},
+{id:“L37”,lvl:“A2”,title:“À la gare”,titleNl:“Op het station”,icon:“🚉”,cats:[“transport”],
+grammar:“Een retour naar Gent. Van welk spoor? Moet ik overstappen? 🇧🇪 Gares bilingues.”,
+drills:[
+{type:“build”,fr:“Un aller-retour pour Gand.”,words:[“Een”,“retour”,“naar”,“Gent”,”,”,“alstublieft”,”.”],extra:[“Brugge”,“enkele”]},
+{type:“build”,fr:“De quelle voie part le train?”,words:[“Van”,“welk”,“spoor”,“vertrekt”,“de”,“trein”,”?”],extra:[“bus”,“komt”]},
+{type:“build”,fr:“Le train part à huit heures.”,words:[“De”,“trein”,“vertrekt”,“om”,“acht”,“uur”,”.”],extra:[“bus”,“tien”]},
+{type:“fill”,sentence:“Moet ik _____? (changer)”,answer:“overstappen”,hint:“changer de transport”},
+{type:“mcq”,q:”‘Het loket’ c’est:”,options:[“le quai”,“le guichet”,“la voie”],answer:1},
+]},
+{id:“L38”,lvl:“A2”,title:“Demander son chemin”,titleNl:“De weg vragen”,icon:“🗺️”,cats:[“direction”,“city”],
+grammar:“Excuseer, hoe kom ik bij…? Is het ver? Het is vijf minuten lopen/met de bus.”,
+drills:[
+{type:“build”,fr:“Excusez-moi, comment aller à la gare?”,words:[“Excuseer”,”,”,“hoe”,“kom”,“ik”,“bij”,“het”,“station”,”?”],extra:[“waar”,“kerk”]},
+{type:“build”,fr:“C’est à dix minutes à pied.”,words:[“Het”,“is”,“tien”,“minuten”,“lopen”,”.”],extra:[“vijf”,“rijden”]},
+{type:“build”,fr:“Prenez la première rue à droite.”,words:[“Neem”,“de”,“eerste”,“straat”,“rechts”,”.”],extra:[“links”,“tweede”]},
+{type:“fill”,sentence:“Is het _____? (loin)”,answer:“ver”,hint:“loin”},
+{type:“build”,fr:“La bibliothèque est près d’ici.”,words:[“De”,“bibliotheek”,“is”,“dichtbij”,”.”],extra:[“ver”,“hier”]},
+]},
+{id:“L39”,lvl:“A2”,title:“As-tu bien dormi?”,titleNl:“Passé composé - oefening”,icon:“📖”,cats:[“verb”],
+grammar:“Heb je goed geslapen? Ben je al geweest? Participes courants: gedaan, gezien, gezegd, gekregen.”,
+drills:[
+{type:“build”,fr:“As-tu bien dormi?”,words:[“Heb”,“je”,“goed”,“geslapen”,”?”],extra:[“ben”,“geweest”]},
+{type:“build”,fr:“J’ai vu le film.”,words:[“Ik”,“heb”,“de”,“film”,“gezien”,”.”],extra:[“gelezen”,“gemaakt”]},
+{type:“pair”,pairs:[[“gedaan”,“fait”],[“gezien”,“vu”],[“gezegd”,“dit”],[“gelezen”,“lu”]]},
+{type:“fill”,sentence:“Heb jij dat _____? (faire, passé)”,answer:“gedaan”,hint:“participe de doen”},
+{type:“build”,fr:“Elle a cuisiné hier soir.”,words:[“Zij”,“heeft”,“gisteravond”,“gekookt”,”.”],extra:[“hij”,“gegeten”]},
+]},
+{id:“L40”,lvl:“A2”,title:“Révision A2 🏆”,titleNl:“Herhaling A2”,icon:“🏆”,cats:[“health”,“work”,“weather”,“hobby”,“city”,“daily”,“admin”,“body”,“verb”],
+grammar:“Tu gères les situations quotidiennes! 350+ mots, passé, futur, comparatifs.”,
+drills:[
+{type:“build”,fr:“Il pleut depuis trois jours.”,words:[“Het”,“regent”,“al”,“drie”,“dagen”,”.”],extra:[“sneeuwt”,“twee”]},
+{type:“build”,fr:“J’ai travaillé dur hier.”,words:[“Ik”,“heb”,“gisteren”,“hard”,“gewerkt”,”.”],extra:[“morgen”,“gedaan”]},
+{type:“pair”,pairs:[[“de dokter”,“le médecin”],[“goedkoop”,“bon marché”],[“fietsen”,“vélo”],[“invullen”,“remplir”]]},
+{type:“build”,fr:“Je me lève chaque jour à 7h.”,words:[“Ik”,“sta”,“elke”,“dag”,“om”,“7”,“uur”,“op”,”.”],extra:[“werk”,“ga”]},
+{type:“fill”,sentence:“Brussel is _____ dan Gent.”,answer:“groter”,hint:“plus grand”},
+{type:“build”,fr:“Nous sommes allés à Bruges.”,words:[“Wij”,“zijn”,“naar”,“Brugge”,“geweest”,”.”],extra:[“Gent”,“gegaan”]},
+{type:“conj”,verb:“willen”,forms:{ik:“wil”,jij:“wilt”,“hij/zij”:“wil”,wij:“willen”}},
+]},
+// ── B1 (10 leçons) ──
+{id:“L41”,lvl:“B1”,title:“Mots de liaison”,titleNl:“Verbindingswoorden”,icon:“🔗”,cats:[“connect”],
+grammar:“omdat/want=parce que. maar=mais. Après ‘omdat’: verbe à la FIN! ‘Ik blijf thuis omdat ik ziek BEN.’”,
+drills:[
+{type:“pair”,pairs:[[“omdat”,“parce que”],[“maar”,“mais”],[“daarom”,“c’est pourquoi”],[“hoewel”,“bien que”]]},
+{type:“build”,fr:“Je reste à la maison parce que je suis malade.”,words:[“Ik”,“blijf”,“thuis”,“omdat”,“ik”,“ziek”,“ben”,”.”],extra:[“want”,“moe”]},
+{type:“build”,fr:“Bien qu’il pleuve, je vais me promener.”,words:[“Hoewel”,“het”,“regent”,”,”,“ga”,“ik”,“wandelen”,”.”],extra:[“sneeuwt”,“fietsen”]},
+{type:“fill”,sentence:“Ik ga niet _____ ik moe ben.”,answer:“omdat”,hint:“parce que”},
+{type:“pair”,pairs:[[“terwijl”,“pendant que”],[“voordat”,“avant que”],[“nadat”,“après que”],[“zodra”,“dès que”]]},
+{type:“mcq”,q:“Après ‘omdat’, le verbe va:”,options:[“en 2ème position”,“à la fin”,“au début”],answer:1},
+{type:“build”,fr:“Dès qu’il arrive, nous partons.”,words:[“Zodra”,“hij”,“aankomt”,”,”,“vertrekken”,“we”,”.”],extra:[“komt”,“gaan”]},
+]},
+{id:“L42”,lvl:“B1”,title:“Émotions”,titleNl:“Gevoelens”,icon:“❤️”,cats:[“emotion”],
+grammar:“Zich voelen = se sentir. Ik voel me blij/verdrietig/zenuwachtig.”,
+drills:[
+{type:“pair”,pairs:[[“teleurgesteld”,“déçu”],[“opgewonden”,“excité”],[“trots”,“fier”],[“opgelucht”,“soulagé”]]},
+{type:“build”,fr:“Je me sens un peu déçu.”,words:[“Ik”,“voel”,“me”,“een”,“beetje”,“teleurgesteld”,”.”],extra:[“blij”,“trots”]},
+{type:“build”,fr:“Je suis fier de moi!”,words:[“Ik”,“ben”,“trots”,“op”,“mezelf”,”!”],extra:[“boos”,“bang”]},
+{type:“fill”,sentence:“Ik voel me *****. (nerveux)”,answer:“zenuwachtig”,hint:“nerveux”},
+{type:“mcq”,q:”‘Eenzaam’ signifie:”,options:[“heureux”,“solitaire”,“fâché”],answer:1},
+{type:“pair”,pairs:[[“verdrietig”,“triste”],[“gelukkig”,“heureux”],[“jaloers”,“jaloux”],[“geschokt”,“choqué”]]},
+]},
+{id:“L43”,lvl:“B1”,title:“Donner son avis”,titleNl:“Je mening geven”,icon:“💭”,cats:[“abstract”],
+grammar:“Ik vind dat… Volgens mij… Ik ben het (niet) eens. Wat denk jij?”,
+drills:[
+{type:“build”,fr:“Je trouve qu’il a raison.”,words:[“Ik”,“vind”,“dat”,“hij”,“gelijk”,“heeft”,”.”],extra:[“zij”,“wij”]},
+{type:“build”,fr:“Selon moi c’est une bonne idée.”,words:[“Volgens”,“mij”,“is”,“dat”,“een”,“goed”,“idee”,”.”],extra:[“slecht”,“oud”]},
+{type:“build”,fr:“Je ne suis pas d’accord.”,words:[“Ik”,“ben”,“het”,“daar”,“niet”,“mee”,“eens”,”.”],extra:[“wel”,“ook”]},
+{type:“pair”,pairs:[[“de mening”,“l’avis”],[“het voorstel”,“la proposition”],[“het probleem”,“le problème”],[“de oplossing”,“la solution”]]},
+{type:“fill”,sentence:”***** mij is dat een goed idee.”,answer:“Volgens”,hint:“selon”},
+{type:“mcq”,q:”‘Het verschil’ signifie:”,options:[“l’exemple”,“la différence”,“le problème”],answer:1},
+]},
+{id:“L44”,lvl:“B1”,title:“Verbes avancés”,titleNl:“Geavanceerde werkwoorden”,icon:“🧠”,cats:[“verbB1”],
+grammar:“bespreken, uitleggen, vergelijken, beslissen, zich herinneren, verbeteren, overtuigen.”,
+drills:[
+{type:“pair”,pairs:[[“uitleggen”,“expliquer”],[“vergelijken”,“comparer”],[“beslissen”,“décider”],[“beschrijven”,“décrire”]]},
+{type:“build”,fr:“Discutons du problème.”,words:[“Laten”,“we”,“het”,“probleem”,“bespreken”,”.”],extra:[“oplossing”,“vraag”]},
+{type:“build”,fr:“Peux-tu expliquer ça?”,words:[“Kun”,“je”,“dat”,“uitleggen”,”?”],extra:[“herhalen”,“vergeten”]},
+{type:“fill”,sentence:“Ik _____ me dat niet meer.”,answer:“herinner”,hint:“se souvenir”},
+{type:“build”,fr:“Nous devons améliorer le résultat.”,words:[“We”,“moeten”,“het”,“resultaat”,“verbeteren”,”.”],extra:[“probleem”,“maken”]},
+{type:“pair”,pairs:[[“ontdekken”,“découvrir”],[“verwachten”,“s’attendre à”],[“verbeteren”,“améliorer”],[“overtuigen”,“convaincre”]]},
+]},
+{id:“L45”,lvl:“B1”,title:“Expressions belges 🇧🇪”,titleNl:“Belgische uitdrukkingen”,icon:“🇧🇪”,cats:[“belgian”],
+grammar:“Belgicismes: goesting (envie), plezant (agréable), ambetant (embêtant). Viennent du français!”,
+drills:[
+{type:“pair”,pairs:[[“amai”,“oh là là”],[“goesting”,“envie”],[“plezant”,“agréable”],[“ambetant”,“embêtant”]]},
+{type:“build”,fr:“J’ai envie d’une petite bière!”,words:[“Ik”,“heb”,“goesting”,“in”,“een”,“pintje”,”!”],extra:[“dorst”,“biertje”]},
+{type:“build”,fr:“Oh là là, chouette!”,words:[“Amai”,”,”,“wat”,“leuk”,”!”],extra:[“slecht”,“saai”]},
+{type:“fill”,sentence:“Het is heel _____ hier. (convivial)”,answer:“gezellig”,hint:“mot clé flamand”},
+{type:“mcq”,q:”‘Gezellig’ signifie:”,options:[“ennuyeux”,“convivial”,“froid”],answer:1},
+{type:“pair”,pairs:[[“schol”,“santé!”],[“komaan”,“allez viens”],[“een pintje”,“petite bière”],[“de boterham”,“tartine”]]},
+]},
+{id:“L46”,lvl:“B1”,title:“Villes belges”,titleNl:“Belgische steden”,icon:“🏰”,cats:[“city_be”],
+grammar:“NL≠FR: Antwerpen≠Anvers, Gent≠Gand, Brugge≠Bruges, Leuven≠Louvain, Mechelen≠Malines.”,
+drills:[
+{type:“pair”,pairs:[[“Antwerpen”,“Anvers”],[“Gent”,“Gand”],[“Brugge”,“Bruges”],[“Leuven”,“Louvain”]]},
+{type:“build”,fr:“Je vais à Gand pour le week-end.”,words:[“Ik”,“ga”,“naar”,“Gent”,“voor”,“het”,“weekend”,”.”],extra:[“Brugge”,“Leuven”]},
+{type:“fill”,sentence:“Ik woon in *****. (Bruxelles)”,answer:“Brussel”,hint:“Bruxelles en NL”},
+{type:“mcq”,q:”‘Mechelen’ en français:”,options:[“Mons”,“Malines”,“Marche”],answer:1},
+{type:“pair”,pairs:[[“Vlaanderen”,“la Flandre”],[“Wallonië”,“la Wallonie”],[“Mechelen”,“Malines”],[“Brussel”,“Bruxelles”]]},
+]},
+{id:“L47”,lvl:“B1”,title:“Small talk”,titleNl:“Koetjes en kalfjes”,icon:“☕”,cats:[“connect”,“emotion”,“belgian”],
+grammar:“Hoe gaat het? Goed hoor! Heb je een goed weekend gehad? Clé de l’intégration en Flandre!”,
+drills:[
+{type:“build”,fr:“As-tu passé un bon week-end?”,words:[“Heb”,“je”,“een”,“goed”,“weekend”,“gehad”,”?”],extra:[“slecht”,“druk”]},
+{type:“build”,fr:“J’ai hâte!”,words:[“Ik”,“kijk”,“ernaar”,“uit”,”!”],extra:[“niet”,“nog”]},
+{type:“build”,fr:“Ne t’inquiète pas, ça ira.”,words:[“Geen”,“zorgen”,”,”,“het”,“komt”,“goed”,”.”],extra:[“slecht”,“niet”]},
+{type:“pair”,pairs:[[“Dat klopt”,“C’est exact”],[“Wat leuk!”,“Chouette!”],[“Laat maar”,“Laisse tomber”],[“Geen zorgen”,“T’inquiète pas”]]},
+{type:“fill”,sentence:”***** hoor, en met jou?”,answer:“Goed”,hint:“bien”},
+]},
+{id:“L48”,lvl:“B1”,title:“Au téléphone”,titleNl:“Telefoneren”,icon:“📱”,cats:[“connect”,“abstract”],
+grammar:”‘Met [nom]’ pour décrocher. ‘Kunt u dat herhalen?’ ‘Kunt u langzamer spreken?’”,
+drills:[
+{type:“build”,fr:“Allô, c’est Thomas.”,words:[“Hallo”,”,”,“met”,“Thomas”,”.”],extra:[“ik”,“ben”]},
+{type:“build”,fr:“Pouvez-vous parler plus lentement?”,words:[“Kunt”,“u”,“langzamer”,“spreken”,”,”,“alstublieft”,”?”],extra:[“sneller”,“harder”]},
+{type:“build”,fr:“Un instant, je vous transfère.”,words:[“Een”,“ogenblikje”,”,”,“ik”,“verbind”,“u”,“door”,”.”],extra:[“moment”,“bel”]},
+{type:“fill”,sentence:“Kunt u dat *****? (répéter)”,answer:“herhalen”,hint:“répéter”},
+{type:“mcq”,q:“Pour décrocher en NL:”,options:[“Hallo?”,“Met [nom]”,“Wie is daar?”],answer:1},
+]},
+{id:“L49”,lvl:“B1”,title:“Phrases de survie”,titleNl:“Overlevingszinnen”,icon:“🆘”,cats:[“connect”,“verbB1”],
+grammar:“Les phrases qui sauvent: Ik begrijp het niet. Kunt u dat herhalen? Hoe zeg je…?”,
+drills:[
+{type:“build”,fr:“Je ne comprends pas.”,words:[“Ik”,“begrijp”,“het”,“niet”,”.”],extra:[“wel”,“goed”]},
+{type:“build”,fr:“Comment dit-on ça en néerlandais?”,words:[“Hoe”,“zeg”,“je”,“dat”,“in”,“het”,“Nederlands”,”?”],extra:[“Frans”,“Engels”]},
+{type:“build”,fr:“Je parle un peu néerlandais.”,words:[“Ik”,“spreek”,“een”,“beetje”,“Nederlands”,”.”],extra:[“goed”,“veel”]},
+{type:“build”,fr:“Pouvez-vous répéter?”,words:[“Kunt”,“u”,“dat”,“herhalen”,”?”],extra:[“zeggen”,“doen”]},
+{type:“fill”,sentence:”***** u Frans? (parler)”,answer:“Spreekt”,hint:“spreken, vouvoiement”},
+{type:“pair”,pairs:[[“begrijpen”,“comprendre”],[“herhalen”,“répéter”],[“uitleggen”,“expliquer”],[“vertalen”,“traduire”]]},
+]},
+{id:“L50”,lvl:“B1”,title:“Examen final! 🎓”,titleNl:“Eindexamen!”,icon:“🎓”,cats:[“greet”,“family”,“food”,“verb”,“adj”,“connect”,“emotion”,“belgian”,“city_be”],
+grammar:“🎉 Tu as tout parcouru! 500+ mots, grammaire complète, expressions belges. Oefening baart kunst!”,
+drills:[
+{type:“build”,fr:“J’ai envie d’une petite bière!”,words:[“Ik”,“heb”,“goesting”,“in”,“een”,“pintje”,”!”],extra:[“dorst”,“biertje”]},
+{type:“build”,fr:“Bien qu’il pleuve, je vais me promener.”,words:[“Hoewel”,“het”,“regent”,”,”,“ga”,“ik”,“wandelen”,”.”],extra:[“sneeuwt”,“fietsen”]},
+{type:“build”,fr:“Selon moi c’est une bonne proposition.”,words:[“Volgens”,“mij”,“is”,“dat”,“een”,“goed”,“voorstel”,”.”],extra:[“slecht”,“idee”]},
+{type:“pair”,pairs:[[“Antwerpen”,“Anvers”],[“gezellig”,“convivial”],[“de mening”,“l’avis”],[“koorts”,“fièvre”]]},
+{type:“fill”,sentence:“Ik heb het boek _____. (lire, passé)”,answer:“gelezen”,hint:“participe de lezen”},
+{type:“conj”,verb:“zijn”,forms:{ik:“ben”,jij:“bent”,“hij/zij”:“is”,“gij 🇧🇪”:“zijt”,wij:“zijn”}},
+{type:“build”,fr:“C’est en forgeant qu’on devient forgeron!”,words:[“Oefening”,“baart”,“kunst”,”!”],extra:[“maakt”,“doet”]},
+{type:“build”,fr:“Je suis fier de moi!”,words:[“Ik”,“ben”,“trots”,“op”,“mezelf”,”!”],extra:[“boos”,“bang”]},
+]},
+];
+
+// ─── VOCAB EXERCISE GENERATOR ────────────────────────────────────
+const genVocabEx = (cats, n=4) => {
+const pool = VOCAB.filter(w=>cats.includes(w.cat));
+if(pool.length<4) return [];
+const sh = […pool].sort(()=>Math.random()-0.5);
+return sh.slice(0,n).map(w => {
+const r = Math.random();
+if(r<0.5) {
+const wr = pool.filter(x=>x.nl!==w.nl).sort(()=>Math.random()-0.5).slice(0,3).map(x=>x.fr);
+const opts=[…wr,w.fr].sort(()=>Math.random()-0.5);
+return {type:“mcq”,q:`Que signifie '${w.nl}'?`,options:opts,answer:opts.indexOf(w.fr)};
+} else {
+const wr = pool.filter(x=>x.nl!==w.nl).sort(()=>Math.random()-0.5).slice(0,3).map(x=>x.nl);
+const opts=[…wr,w.nl].sort(()=>Math.random()-0.5);
+return {type:“mcq”,q:`Comment dit-on '${w.fr}'?`,options:opts,answer:opts.indexOf(w.nl)};
+}
+});
+};
+
+// ─── VERB CONJUGATION DATABASE (40+ verbs, all tenses) ──────────
+// Each verb: [infinitif, traduction, catégorie, {present, past, perfect}]
+// present/past: {ik,jij,hij,wij,jullie,zij} · perfect: [aux, participe]
+const VERBS = [
+// ── ESSENTIELS ──
+{inf:“zijn”,fr:“être”,cat:“essentiels”,pr:{ik:“ben”,jij:“bent”,“hij/zij”:“is”,wij:“zijn”,jullie:“zijn”,zij:“zijn”,“gij 🇧🇪”:“zijt”},
+pa:{ik:“was”,jij:“was”,“hij/zij”:“was”,wij:“waren”,jullie:“waren”,zij:“waren”},pf:[“zijn”,“geweest”]},
+{inf:“hebben”,fr:“avoir”,cat:“essentiels”,pr:{ik:“heb”,jij:“hebt”,“hij/zij”:“heeft”,wij:“hebben”,jullie:“hebben”,zij:“hebben”,“gij 🇧🇪”:“hebt”},
+pa:{ik:“had”,jij:“had”,“hij/zij”:“had”,wij:“hadden”,jullie:“hadden”,zij:“hadden”},pf:[“hebben”,“gehad”]},
+{inf:“worden”,fr:“devenir”,cat:“essentiels”,pr:{ik:“word”,jij:“wordt”,“hij/zij”:“wordt”,wij:“worden”,jullie:“worden”,zij:“worden”},
+pa:{ik:“werd”,jij:“werd”,“hij/zij”:“werd”,wij:“werden”,jullie:“werden”,zij:“werden”},pf:[“zijn”,“geworden”]},
+{inf:“zullen”,fr:”(futur)”,cat:“essentiels”,pr:{ik:“zal”,jij:“zult/zal”,“hij/zij”:“zal”,wij:“zullen”,jullie:“zullen”,zij:“zullen”},
+pa:{ik:“zou”,jij:“zou”,“hij/zij”:“zou”,wij:“zouden”,jullie:“zouden”,zij:“zouden”},pf:null},
+// ── MODAUX ──
+{inf:“willen”,fr:“vouloir”,cat:“modaux”,pr:{ik:“wil”,jij:“wilt/wil”,“hij/zij”:“wil”,wij:“willen”,jullie:“willen”,zij:“willen”},
+pa:{ik:“wilde/wou”,jij:“wilde/wou”,“hij/zij”:“wilde/wou”,wij:“wilden”,jullie:“wilden”,zij:“wilden”},pf:[“hebben”,“gewild”]},
+{inf:“kunnen”,fr:“pouvoir”,cat:“modaux”,pr:{ik:“kan”,jij:“kunt/kan”,“hij/zij”:“kan”,wij:“kunnen”,jullie:“kunnen”,zij:“kunnen”},
+pa:{ik:“kon”,jij:“kon”,“hij/zij”:“kon”,wij:“konden”,jullie:“konden”,zij:“konden”},pf:[“hebben”,“gekund”]},
+{inf:“moeten”,fr:“devoir”,cat:“modaux”,pr:{ik:“moet”,jij:“moet”,“hij/zij”:“moet”,wij:“moeten”,jullie:“moeten”,zij:“moeten”},
+pa:{ik:“moest”,jij:“moest”,“hij/zij”:“moest”,wij:“moesten”,jullie:“moesten”,zij:“moesten”},pf:[“hebben”,“gemoeten”]},
+{inf:“mogen”,fr:“avoir le droit”,cat:“modaux”,pr:{ik:“mag”,jij:“mag”,“hij/zij”:“mag”,wij:“mogen”,jullie:“mogen”,zij:“mogen”},
+pa:{ik:“mocht”,jij:“mocht”,“hij/zij”:“mocht”,wij:“mochten”,jullie:“mochten”,zij:“mochten”},pf:[“hebben”,“gemogen”]},
+// ── ACTIONS QUOTIDIENNES ──
+{inf:“werken”,fr:“travailler”,cat:“quotidien”,pr:{ik:“werk”,jij:“werkt”,“hij/zij”:“werkt”,wij:“werken”,jullie:“werken”,zij:“werken”},
+pa:{ik:“werkte”,jij:“werkte”,“hij/zij”:“werkte”,wij:“werkten”,jullie:“werkten”,zij:“werkten”},pf:[“hebben”,“gewerkt”]},
+{inf:“wonen”,fr:“habiter”,cat:“quotidien”,pr:{ik:“woon”,jij:“woont”,“hij/zij”:“woont”,wij:“wonen”,jullie:“wonen”,zij:“wonen”},
+pa:{ik:“woonde”,jij:“woonde”,“hij/zij”:“woonde”,wij:“woonden”,jullie:“woonden”,zij:“woonden”},pf:[“hebben”,“gewoond”]},
+{inf:“eten”,fr:“manger”,cat:“quotidien”,pr:{ik:“eet”,jij:“eet”,“hij/zij”:“eet”,wij:“eten”,jullie:“eten”,zij:“eten”},
+pa:{ik:“at”,jij:“at”,“hij/zij”:“at”,wij:“aten”,jullie:“aten”,zij:“aten”},pf:[“hebben”,“gegeten”]},
+{inf:“drinken”,fr:“boire”,cat:“quotidien”,pr:{ik:“drink”,jij:“drinkt”,“hij/zij”:“drinkt”,wij:“drinken”,jullie:“drinken”,zij:“drinken”},
+pa:{ik:“dronk”,jij:“dronk”,“hij/zij”:“dronk”,wij:“dronken”,jullie:“dronken”,zij:“dronken”},pf:[“hebben”,“gedronken”]},
+{inf:“slapen”,fr:“dormir”,cat:“quotidien”,pr:{ik:“slaap”,jij:“slaapt”,“hij/zij”:“slaapt”,wij:“slapen”,jullie:“slapen”,zij:“slapen”},
+pa:{ik:“sliep”,jij:“sliep”,“hij/zij”:“sliep”,wij:“sliepen”,jullie:“sliepen”,zij:“sliepen”},pf:[“hebben”,“geslapen”]},
+{inf:“kopen”,fr:“acheter”,cat:“quotidien”,pr:{ik:“koop”,jij:“koopt”,“hij/zij”:“koopt”,wij:“kopen”,jullie:“kopen”,zij:“kopen”},
+pa:{ik:“kocht”,jij:“kocht”,“hij/zij”:“kocht”,wij:“kochten”,jullie:“kochten”,zij:“kochten”},pf:[“hebben”,“gekocht”]},
+{inf:“betalen”,fr:“payer”,cat:“quotidien”,pr:{ik:“betaal”,jij:“betaalt”,“hij/zij”:“betaalt”,wij:“betalen”,jullie:“betalen”,zij:“betalen”},
+pa:{ik:“betaalde”,jij:“betaalde”,“hij/zij”:“betaalde”,wij:“betaalden”,jullie:“betaalden”,zij:“betaalden”},pf:[“hebben”,“betaald”]},
+{inf:“maken”,fr:“faire/fabriquer”,cat:“quotidien”,pr:{ik:“maak”,jij:“maakt”,“hij/zij”:“maakt”,wij:“maken”,jullie:“maken”,zij:“maken”},
+pa:{ik:“maakte”,jij:“maakte”,“hij/zij”:“maakte”,wij:“maakten”,jullie:“maakten”,zij:“maakten”},pf:[“hebben”,“gemaakt”]},
+// ── MOUVEMENT ──
+{inf:“gaan”,fr:“aller”,cat:“mouvement”,pr:{ik:“ga”,jij:“gaat”,“hij/zij”:“gaat”,wij:“gaan”,jullie:“gaan”,zij:“gaan”},
+pa:{ik:“ging”,jij:“ging”,“hij/zij”:“ging”,wij:“gingen”,jullie:“gingen”,zij:“gingen”},pf:[“zijn”,“gegaan”]},
+{inf:“komen”,fr:“venir”,cat:“mouvement”,pr:{ik:“kom”,jij:“komt”,“hij/zij”:“komt”,wij:“komen”,jullie:“komen”,zij:“komen”},
+pa:{ik:“kwam”,jij:“kwam”,“hij/zij”:“kwam”,wij:“kwamen”,jullie:“kwamen”,zij:“kwamen”},pf:[“zijn”,“gekomen”]},
+{inf:“lopen”,fr:“marcher”,cat:“mouvement”,pr:{ik:“loop”,jij:“loopt”,“hij/zij”:“loopt”,wij:“lopen”,jullie:“lopen”,zij:“lopen”},
+pa:{ik:“liep”,jij:“liep”,“hij/zij”:“liep”,wij:“liepen”,jullie:“liepen”,zij:“liepen”},pf:[“hebben”,“gelopen”]},
+{inf:“rijden”,fr:“conduire”,cat:“mouvement”,pr:{ik:“rijd”,jij:“rijdt”,“hij/zij”:“rijdt”,wij:“rijden”,jullie:“rijden”,zij:“rijden”},
+pa:{ik:“reed”,jij:“reed”,“hij/zij”:“reed”,wij:“reden”,jullie:“reden”,zij:“reden”},pf:[“hebben”,“gereden”]},
+{inf:“fietsen”,fr:“faire du vélo”,cat:“mouvement”,pr:{ik:“fiets”,jij:“fietst”,“hij/zij”:“fietst”,wij:“fietsen”,jullie:“fietsen”,zij:“fietsen”},
+pa:{ik:“fietste”,jij:“fietste”,“hij/zij”:“fietste”,wij:“fietsten”,jullie:“fietsten”,zij:“fietsten”},pf:[“hebben”,“gefietst”]},
+{inf:“vertrekken”,fr:“partir”,cat:“mouvement”,pr:{ik:“vertrek”,jij:“vertrekt”,“hij/zij”:“vertrekt”,wij:“vertrekken”,jullie:“vertrekken”,zij:“vertrekken”},
+pa:{ik:“vertrok”,jij:“vertrok”,“hij/zij”:“vertrok”,wij:“vertrokken”,jullie:“vertrokken”,zij:“vertrokken”},pf:[“zijn”,“vertrokken”]},
+{inf:“vliegen”,fr:“voler (avion)”,cat:“mouvement”,pr:{ik:“vlieg”,jij:“vliegt”,“hij/zij”:“vliegt”,wij:“vliegen”,jullie:“vliegen”,zij:“vliegen”},
+pa:{ik:“vloog”,jij:“vloog”,“hij/zij”:“vloog”,wij:“vlogen”,jullie:“vlogen”,zij:“vlogen”},pf:[“hebben”,“gevlogen”]},
+// ── COMMUNICATION ──
+{inf:“spreken”,fr:“parler”,cat:“communication”,pr:{ik:“spreek”,jij:“spreekt”,“hij/zij”:“spreekt”,wij:“spreken”,jullie:“spreken”,zij:“spreken”},
+pa:{ik:“sprak”,jij:“sprak”,“hij/zij”:“sprak”,wij:“spraken”,jullie:“spraken”,zij:“spraken”},pf:[“hebben”,“gesproken”]},
+{inf:“zeggen”,fr:“dire”,cat:“communication”,pr:{ik:“zeg”,jij:“zegt”,“hij/zij”:“zegt”,wij:“zeggen”,jullie:“zeggen”,zij:“zeggen”},
+pa:{ik:“zei”,jij:“zei”,“hij/zij”:“zei”,wij:“zeiden”,jullie:“zeiden”,zij:“zeiden”},pf:[“hebben”,“gezegd”]},
+{inf:“lezen”,fr:“lire”,cat:“communication”,pr:{ik:“lees”,jij:“leest”,“hij/zij”:“leest”,wij:“lezen”,jullie:“lezen”,zij:“lezen”},
+pa:{ik:“las”,jij:“las”,“hij/zij”:“las”,wij:“lazen”,jullie:“lazen”,zij:“lazen”},pf:[“hebben”,“gelezen”]},
+{inf:“schrijven”,fr:“écrire”,cat:“communication”,pr:{ik:“schrijf”,jij:“schrijft”,“hij/zij”:“schrijft”,wij:“schrijven”,jullie:“schrijven”,zij:“schrijven”},
+pa:{ik:“schreef”,jij:“schreef”,“hij/zij”:“schreef”,wij:“schreven”,jullie:“schreven”,zij:“schreven”},pf:[“hebben”,“geschreven”]},
+{inf:“luisteren”,fr:“écouter”,cat:“communication”,pr:{ik:“luister”,jij:“luistert”,“hij/zij”:“luistert”,wij:“luisteren”,jullie:“luisteren”,zij:“luisteren”},
+pa:{ik:“luisterde”,jij:“luisterde”,“hij/zij”:“luisterde”,wij:“luisterden”,jullie:“luisterden”,zij:“luisterden”},pf:[“hebben”,“geluisterd”]},
+{inf:“vragen”,fr:“demander”,cat:“communication”,pr:{ik:“vraag”,jij:“vraagt”,“hij/zij”:“vraagt”,wij:“vragen”,jullie:“vragen”,zij:“vragen”},
+pa:{ik:“vroeg”,jij:“vroeg”,“hij/zij”:“vroeg”,wij:“vroegen”,jullie:“vroegen”,zij:“vroegen”},pf:[“hebben”,“gevraagd”]},
+{inf:“antwoorden”,fr:“répondre”,cat:“communication”,pr:{ik:“antwoord”,jij:“antwoordt”,“hij/zij”:“antwoordt”,wij:“antwoorden”,jullie:“antwoorden”,zij:“antwoorden”},
+pa:{ik:“antwoordde”,jij:“antwoordde”,“hij/zij”:“antwoordde”,wij:“antwoordden”,jullie:“antwoordden”,zij:“antwoordden”},pf:[“hebben”,“geantwoord”]},
+{inf:“bellen”,fr:“téléphoner”,cat:“communication”,pr:{ik:“bel”,jij:“belt”,“hij/zij”:“belt”,wij:“bellen”,jullie:“bellen”,zij:“bellen”},
+pa:{ik:“belde”,jij:“belde”,“hij/zij”:“belde”,wij:“belden”,jullie:“belden”,zij:“belden”},pf:[“hebben”,“gebeld”]},
+// ── PENSÉE ──
+{inf:“denken”,fr:“penser”,cat:“pensée”,pr:{ik:“denk”,jij:“denkt”,“hij/zij”:“denkt”,wij:“denken”,jullie:“denken”,zij:“denken”},
+pa:{ik:“dacht”,jij:“dacht”,“hij/zij”:“dacht”,wij:“dachten”,jullie:“dachten”,zij:“dachten”},pf:[“hebben”,“gedacht”]},
+{inf:“weten”,fr:“savoir”,cat:“pensée”,pr:{ik:“weet”,jij:“weet”,“hij/zij”:“weet”,wij:“weten”,jullie:“weten”,zij:“weten”},
+pa:{ik:“wist”,jij:“wist”,“hij/zij”:“wist”,wij:“wisten”,jullie:“wisten”,zij:“wisten”},pf:[“hebben”,“geweten”]},
+{inf:“begrijpen”,fr:“comprendre”,cat:“pensée”,pr:{ik:“begrijp”,jij:“begrijpt”,“hij/zij”:“begrijpt”,wij:“begrijpen”,jullie:“begrijpen”,zij:“begrijpen”},
+pa:{ik:“begreep”,jij:“begreep”,“hij/zij”:“begreep”,wij:“begrepen”,jullie:“begrepen”,zij:“begrepen”},pf:[“hebben”,“begrepen”]},
+{inf:“vinden”,fr:“trouver/penser”,cat:“pensée”,pr:{ik:“vind”,jij:“vindt”,“hij/zij”:“vindt”,wij:“vinden”,jullie:“vinden”,zij:“vinden”},
+pa:{ik:“vond”,jij:“vond”,“hij/zij”:“vond”,wij:“vonden”,jullie:“vonden”,zij:“vonden”},pf:[“hebben”,“gevonden”]},
+{inf:“kennen”,fr:“connaître”,cat:“pensée”,pr:{ik:“ken”,jij:“kent”,“hij/zij”:“kent”,wij:“kennen”,jullie:“kennen”,zij:“kennen”},
+pa:{ik:“kende”,jij:“kende”,“hij/zij”:“kende”,wij:“kenden”,jullie:“kenden”,zij:“kenden”},pf:[“hebben”,“gekend”]},
+{inf:“leren”,fr:“apprendre”,cat:“pensée”,pr:{ik:“leer”,jij:“leert”,“hij/zij”:“leert”,wij:“leren”,jullie:“leren”,zij:“leren”},
+pa:{ik:“leerde”,jij:“leerde”,“hij/zij”:“leerde”,wij:“leerden”,jullie:“leerden”,zij:“leerden”},pf:[“hebben”,“geleerd”]},
+// ── ACTIONS DIVERSES ──
+{inf:“doen”,fr:“faire”,cat:“divers”,pr:{ik:“doe”,jij:“doet”,“hij/zij”:“doet”,wij:“doen”,jullie:“doen”,zij:“doen”},
+pa:{ik:“deed”,jij:“deed”,“hij/zij”:“deed”,wij:“deden”,jullie:“deden”,zij:“deden”},pf:[“hebben”,“gedaan”]},
+{inf:“geven”,fr:“donner”,cat:“divers”,pr:{ik:“geef”,jij:“geeft”,“hij/zij”:“geeft”,wij:“geven”,jullie:“geven”,zij:“geven”},
+pa:{ik:“gaf”,jij:“gaf”,“hij/zij”:“gaf”,wij:“gaven”,jullie:“gaven”,zij:“gaven”},pf:[“hebben”,“gegeven”]},
+{inf:“nemen”,fr:“prendre”,cat:“divers”,pr:{ik:“neem”,jij:“neemt”,“hij/zij”:“neemt”,wij:“nemen”,jullie:“nemen”,zij:“nemen”},
+pa:{ik:“nam”,jij:“nam”,“hij/zij”:“nam”,wij:“namen”,jullie:“namen”,zij:“namen”},pf:[“hebben”,“genomen”]},
+{inf:“zien”,fr:“voir”,cat:“divers”,pr:{ik:“zie”,jij:“ziet”,“hij/zij”:“ziet”,wij:“zien”,jullie:“zien”,zij:“zien”},
+pa:{ik:“zag”,jij:“zag”,“hij/zij”:“zag”,wij:“zagen”,jullie:“zagen”,zij:“zagen”},pf:[“hebben”,“gezien”]},
+{inf:“kijken”,fr:“regarder”,cat:“divers”,pr:{ik:“kijk”,jij:“kijkt”,“hij/zij”:“kijkt”,wij:“kijken”,jullie:“kijken”,zij:“kijken”},
+pa:{ik:“keek”,jij:“keek”,“hij/zij”:“keek”,wij:“keken”,jullie:“keken”,zij:“keken”},pf:[“hebben”,“gekeken”]},
+{inf:“helpen”,fr:“aider”,cat:“divers”,pr:{ik:“help”,jij:“helpt”,“hij/zij”:“helpt”,wij:“helpen”,jullie:“helpen”,zij:“helpen”},
+pa:{ik:“hielp”,jij:“hielp”,“hij/zij”:“hielp”,wij:“hielpen”,jullie:“hielpen”,zij:“hielpen”},pf:[“hebben”,“geholpen”]},
+{inf:“beginnen”,fr:“commencer”,cat:“divers”,pr:{ik:“begin”,jij:“begint”,“hij/zij”:“begint”,wij:“beginnen”,jullie:“beginnen”,zij:“beginnen”},
+pa:{ik:“begon”,jij:“begon”,“hij/zij”:“begon”,wij:“begonnen”,jullie:“begonnen”,zij:“begonnen”},pf:[“zijn”,“begonnen”]},
+{inf:“staan”,fr:“être debout”,cat:“divers”,pr:{ik:“sta”,jij:“staat”,“hij/zij”:“staat”,wij:“staan”,jullie:“staan”,zij:“staan”},
+pa:{ik:“stond”,jij:“stond”,“hij/zij”:“stond”,wij:“stonden”,jullie:“stonden”,zij:“stonden”},pf:[“hebben”,“gestaan”]},
+{inf:“zitten”,fr:“être assis”,cat:“divers”,pr:{ik:“zit”,jij:“zit”,“hij/zij”:“zit”,wij:“zitten”,jullie:“zitten”,zij:“zitten”},
+pa:{ik:“zat”,jij:“zat”,“hij/zij”:“zat”,wij:“zaten”,jullie:“zaten”,zij:“zaten”},pf:[“hebben”,“gezeten”]},
+{inf:“liggen”,fr:“être couché”,cat:“divers”,pr:{ik:“lig”,jij:“ligt”,“hij/zij”:“ligt”,wij:“liggen”,jullie:“liggen”,zij:“liggen”},
+pa:{ik:“lag”,jij:“lag”,“hij/zij”:“lag”,wij:“lagen”,jullie:“lagen”,zij:“lagen”},pf:[“hebben”,“gelegen”]},
+{inf:“houden”,fr:“tenir/aimer”,cat:“divers”,pr:{ik:“houd”,jij:“houdt”,“hij/zij”:“houdt”,wij:“houden”,jullie:“houden”,zij:“houden”},
+pa:{ik:“hield”,jij:“hield”,“hij/zij”:“hield”,wij:“hielden”,jullie:“hielden”,zij:“hielden”},pf:[“hebben”,“gehouden”]},
+{inf:“brengen”,fr:“apporter”,cat:“divers”,pr:{ik:“breng”,jij:“brengt”,“hij/zij”:“brengt”,wij:“brengen”,jullie:“brengen”,zij:“brengen”},
+pa:{ik:“bracht”,jij:“bracht”,“hij/zij”:“bracht”,wij:“brachten”,jullie:“brachten”,zij:“brachten”},pf:[“hebben”,“gebracht”]},
+{inf:“blijven”,fr:“rester”,cat:“divers”,pr:{ik:“blijf”,jij:“blijft”,“hij/zij”:“blijft”,wij:“blijven”,jullie:“blijven”,zij:“blijven”},
+pa:{ik:“bleef”,jij:“bleef”,“hij/zij”:“bleef”,wij:“bleven”,jullie:“bleven”,zij:“bleven”},pf:[“zijn”,“gebleven”]},
+{inf:“vergeten”,fr:“oublier”,cat:“divers”,pr:{ik:“vergeet”,jij:“vergeet”,“hij/zij”:“vergeet”,wij:“vergeten”,jullie:“vergeten”,zij:“vergeten”},
+pa:{ik:“vergat”,jij:“vergat”,“hij/zij”:“vergat”,wij:“vergaten”,jullie:“vergaten”,zij:“vergaten”},pf:[“zijn”,“vergeten”]},
+];
+const VERB_CATS = [“essentiels”,“modaux”,“quotidien”,“mouvement”,“communication”,“pensée”,“divers”];
+const VERB_CAT_LABELS = {“essentiels”:“Essentiels”,“modaux”:“Modaux”,“quotidien”:“Quotidien”,“mouvement”:“Mouvement”,“communication”:“Communication”,“pensée”:“Pensée”,“divers”:“Divers”};
+const TENSE_LABELS = {pr:“Présent”,pa:“Passé (OVT)”,pf:“Passé composé (VTT)”,fu:“Futur”};
+const ZULLEN = {ik:“zal”,jij:“zult/zal”,“hij/zij”:“zal”,wij:“zullen”,jullie:“zullen”,zij:“zullen”,“gij 🇧🇪”:“zult”};
+const getFuture = (inf) => Object.fromEntries(Object.entries(ZULLEN).map(([p,z])=>[p,`${z} ${inf}`]));
+const getVerbForms = (v, tense) => {
+if(tense===“fu”) return getFuture(v.inf);
+if(tense===“pr”||tense===“pa”) return v[tense];
+return null;
+};
+const PRONOUNS = [“ik”,“jij”,“hij/zij”,“wij”,“jullie”,“zij”];
+
+// ─── MAIN APP ────────────────────────────────────────────────────
+function App(){
+const[screen,setScreen]=useState(“home”);
+const[progress,setProgress]=useState({done:[],xp:0});
+const[selLevel,setSelLevel]=useState(null);
+const[selLesson,setSelLesson]=useState(null);
+const[exIdx,setExIdx]=useState(0);
+const[exercises,setExercises]=useState([]);
+const[answer,setAnswer]=useState(null);
+const[textAns,setTextAns]=useState(””);
+const[checked,setChecked]=useState(false);
+const[correct,setCorrect]=useState(false);
+const[score,setScore]=useState(0);
+const[total,setTotal]=useState(0);
+const[conjAns,setConjAns]=useState({});
+const[buildOrder,setBuildOrder]=useState([]);
+const[pairSel,setPairSel]=useState(null);
+const[pairDone,setPairDone]=useState([]);
+const[shuffledRight,setShuffledRight]=useState([]);
+const[shuffledWords,setShuffledWords]=useState([]);
+const[fcIdx,setFcIdx]=useState(0);
+const[fcFlip,setFcFlip]=useState(false);
+const[fcCat,setFcCat]=useState(0);
+const[search,setSearch]=useState(””);
+const[verbCat,setVerbCat]=useState(null);
+const[verbSel,setVerbSel]=useState(null);
+const[verbTense,setVerbTense]=useState(“pr”);
+const[verbMode,setVerbMode]=useState(“browse”); // browse | practice
+const[verbPractice,setVerbPractice]=useState({});
+const[verbChecked,setVerbChecked]=useState(false);
+const[verbCorrect,setVerbCorrect]=useState(false);
+const[verbQuizVerb,setVerbQuizVerb]=useState(null);
+const[verbQuizTense,setVerbQuizTense]=useState(“pr”);
+const[verbScore,setVerbScore]=useState({total:0,correct:0});
+
+useEffect(()=>{try{const r=localStorage.getItem(‘vl3’);if(r)setProgress(JSON.parse(r));}catch(e){}window.speechSynthesis?.getVoices();},[]);
+const save=useCallback(p=>{setProgress(p);try{localStorage.setItem(‘vl3’,JSON.stringify(p));}catch(e){}},[]);
+
+const startLesson=l=>{
+const vocab=genVocabEx(l.cats,4);
+const all=[…vocab,…(l.drills||[])].sort(()=>Math.random()-0.5);
+setExercises(all);setExIdx(0);setScore(0);setTotal(all.length);
+resetEx();setSelLesson(l);setScreen(“exercise”);
+};
+const resetEx=()=>{setAnswer(null);setTextAns(””);setChecked(false);setCorrect(false);setConjAns({});setBuildOrder([]);setPairSel(null);setPairDone([]);setShuffledRight([]);setShuffledWords([]);};
+const nextEx=()=>{setExIdx(i=>i+1);resetEx();};
+
+// Pre-shuffle words when exercise changes
+useEffect(()=>{
+if(exercises.length===0||exIdx>=exercises.length)return;
+const ex=exercises[exIdx];
+if(ex.type===“build”){
+const all=[…ex.words,…(ex.extra||[])];
+setShuffledWords([…all].sort(()=>Math.random()-0.5));
+}
+if(ex.type===“pair”){
+const r=ex.pairs.map(([,b],i)=>({t:b,id:i,s:“r”})).sort(()=>Math.random()-0.5);
+setShuffledRight(r);
+}
+},[exIdx,exercises]);
+const finishLesson=()=>{
+const p={…progress};
+if(!p.done.includes(selLesson.id))p.done=[…p.done,selLesson.id];
+p.xp=(p.xp||0)+score*10+20;
+save(p);setScreen(“result”);
+};
+
+const C=selLesson?(LEVELS.find(l=>l.id===selLesson.lvl)?.color||”#FF6B35”):”#FF6B35”;
+const allVocab=useMemo(()=>VOCAB,[]);
+const fcCats=[{n:“Tout”,f:null},{n:“A0”,f:0},{n:“A1”,f:1},{n:“A2”,f:2},{n:“B1”,f:3}];
+const fcPool=fcCats[fcCat].f!==null?allVocab.filter(w=>w.lvl===fcCats[fcCat].f):allVocab;
+const fcCard=fcPool[fcIdx%fcPool.length];
+const searched=useMemo(()=>{if(!search)return[];const s=search.toLowerCase();return allVocab.filter(w=>w.nl.toLowerCase().includes(s)||w.fr.toLowerCase().includes(s)).slice(0,25);},[search,allVocab]);
+const totalL=LESSONS.length,doneL=progress.done?.length||0,pct=Math.round(doneL/totalL*100);
+
+// ─── STYLES ────
+const sBtn={width:“100%”,padding:“14px”,borderRadius:14,fontSize:16,fontWeight:700,cursor:“pointer”,border:“none”,fontFamily:“inherit”};
+const sCard={background:“var(–card)”,borderRadius:16,padding:“16px”,border:“1px solid var(–brd)”};
+
+// ─── EXERCISE RENDERER ────
+const renderEx=()=>{
+if(exIdx>=exercises.length){finishLesson();return null;}
+const ex=exercises[exIdx];
+const prog=(exIdx/exercises.length)*100;
+const hdr=<div style={{marginBottom:16}}>
+<div style={{display:“flex”,justifyContent:“space-between”,marginBottom:8}}>
+<span style={{color:“var(–dim)”,fontSize:13,fontWeight:600}}>{exIdx+1} / {exercises.length}</span>
+<span style={{color:C,fontSize:13,fontWeight:700}}>✓ {score}</span>
+</div>
+<div style={{background:“var(–bg2)”,borderRadius:8,height:5,overflow:“hidden”}}>
+<div style={{background:C,height:“100%”,width:`${prog}%`,borderRadius:8,transition:“width 0.3s”}}/>
+</div>
+</div>;
+const nxtBtn=checked&&<button onClick={nextEx} style={{…sBtn,background:“var(–card)”,color:C,border:`2px solid ${C}`,marginTop:12}}>{exIdx<exercises.length-1?“Suivant →”:“Voir résultat →”}</button>;
+const resBox=(ok,ans)=><div style={{…sCard,marginTop:10,borderColor:ok?”#4CAF50”:”#EF5350”,background:ok?”#1B5E2020”:”#B71C1C20”}}>
+<span style={{fontSize:18,marginRight:8}}>{ok?“✅”:“❌”}</span>
+<span style={{fontWeight:700,color:ok?”#4CAF50”:”#EF5350”}}>{ok?“Correct !”:“Pas tout à fait”}</span>
+{!ok&&ans&&<p style={{color:“var(–dim)”,fontSize:13,margin:“6px 0 0”}}>Réponse : <strong style={{color:“var(–txt)”}}>{ans}</strong></p>}
+</div>;
+
+```
+// ═══ BUILD SENTENCE (main exercise!) ═══
+if(ex.type==="build"){
+  if(shuffledWords.length===0) return <div>{hdr}<p style={{color:"var(--dim)"}}>Chargement...</p></div>;
+  const shuffled=shuffledWords;
+  const built=buildOrder.map(i=>shuffled[i]).join(" ");
+  const target=ex.words.join(" ");
+  const isDone=built===target;
+  const allPlaced=buildOrder.length===shuffled.length;
+
+  return <div>{hdr}
+    <div style={{...sCard,marginBottom:14}}>
+      <p style={{fontSize:13,color:"var(--dim)",margin:"0 0 4px",fontWeight:600}}>🧩 Reconstitue la phrase :</p>
+      <p style={{fontSize:15,fontWeight:700,color:C,margin:0}}>{ex.fr}</p>
+      {ex.words&&<div style={{marginTop:8}}><Sp text={ex.words.join(" ").replace(/ ([.,!?])/g,"$1")} color={C}/></div>}
+    </div>
+    {/* Built area */}
+    <div style={{...sCard,minHeight:52,marginBottom:14,display:"flex",flexWrap:"wrap",gap:6,alignItems:"center",borderColor:checked?(correct?"#4CAF50":"#EF5350"):"var(--brd)"}}>
+      {buildOrder.length===0&&<span style={{color:"var(--dim)",fontSize:14}}>Tape les mots...</span>}
+      {buildOrder.map((idx,i)=>(
+        <button key={`b${i}`} onClick={()=>{if(!checked)setBuildOrder(bo=>bo.filter(x=>x!==idx));}}
+          style={{background:C+"20",border:`1px solid ${C}50`,borderRadius:10,padding:"8px 14px",fontSize:15,fontWeight:700,color:C,cursor:checked?"default":"pointer",transition:"all 0.15s"}}>
+          {shuffled[idx]}
+        </button>
+      ))}
+    </div>
+    {/* Word pool */}
+    <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
+      {shuffled.map((w,i)=>{
+        const used=buildOrder.includes(i);
+        return <button key={`w${i}`} onClick={()=>{if(!checked&&!used)setBuildOrder(bo=>[...bo,i]);}}
+          style={{background:used?"var(--bg2)":"var(--card)",border:`1px solid ${used?"var(--bg2)":"var(--brd)"}`,borderRadius:11,padding:"9px 15px",fontSize:15,fontWeight:600,
+          color:used?"transparent":"var(--txt)",cursor:used?"default":"pointer",transition:"all 0.15s",minHeight:40}}>
+          {w}
+        </button>;
+      })}
+    </div>
+    {checked&&!correct&&resBox(false,target.replace(/ ([.,!?])/g,"$1"))}
+    {checked&&correct&&<div style={{...sCard,marginTop:10,borderColor:"#4CAF50",background:"#1B5E2020"}}>✅ <span style={{fontWeight:700,color:"#4CAF50"}}>Parfait !</span></div>}
+    {!checked&&allPlaced&&<button onClick={()=>{const ok=isDone;setChecked(true);setCorrect(ok);if(ok)setScore(s=>s+1);}} style={{...sBtn,background:C,color:"#fff",marginTop:12}}>Vérifier</button>}
+    {nxtBtn}
+  </div>;
+}
+
+// ═══ MCQ ═══
+if(ex.type==="mcq") return <div>{hdr}
+  <div style={{...sCard,marginBottom:14}}><p style={{fontSize:16,fontWeight:700,color:"var(--txt)",margin:0,lineHeight:1.5}}>{ex.q}</p></div>
+  <div style={{display:"flex",flexDirection:"column",gap:7}}>
+    {ex.options.map((o,i)=>{
+      let bg="var(--card)",bc="var(--brd)",tc="var(--txt)";
+      if(checked){if(i===ex.answer){bg="#1B5E20";bc="#4CAF50";tc="#fff";}else if(i===answer){bg="#B71C1C";bc="#EF5350";tc="#fff";}}
+      else if(i===answer){bg=C+"22";bc=C;tc=C;}
+      return <button key={i} onClick={()=>{if(!checked)setAnswer(i);}} style={{background:bg,border:`2px solid ${bc}`,borderRadius:14,padding:"13px 16px",fontSize:15,fontWeight:600,color:tc,cursor:checked?"default":"pointer",textAlign:"left",width:"100%",transition:"all 0.15s"}}>{o}</button>;
+    })}
+  </div>
+  {!checked&&answer!==null&&<button onClick={()=>{setChecked(true);const c=answer===ex.answer;setCorrect(c);if(c)setScore(s=>s+1);}} style={{...sBtn,background:C,color:"#fff",marginTop:14}}>Vérifier</button>}
+  {checked&&resBox(correct,ex.options[ex.answer])}
+  {nxtBtn}
+</div>;
+
+// ═══ FILL ═══
+if(ex.type==="fill") return <div>{hdr}
+  <div style={{...sCard,marginBottom:14}}>
+    <p style={{fontSize:13,color:"var(--dim)",margin:"0 0 4px",fontWeight:600}}>✏️ Complète :</p>
+    <p style={{fontSize:17,fontWeight:700,color:"var(--txt)",margin:0,lineHeight:1.6}}>{ex.sentence}</p>
+    {ex.hint&&<p style={{fontSize:12,color:C,margin:"8px 0 0"}}>💡 {ex.hint}</p>}
+  </div>
+  <input type="text" value={textAns} onChange={e=>setTextAns(e.target.value)} disabled={checked} placeholder="Ta réponse..."
+    onKeyDown={e=>{if(e.key==="Enter"&&textAns.trim()&&!checked){setChecked(true);const c=textAns.trim().toLowerCase()===ex.answer.toLowerCase();setCorrect(c);if(c)setScore(s=>s+1);}}}
+    style={{width:"100%",padding:"14px 16px",borderRadius:14,border:`2px solid ${checked?(correct?"#4CAF50":"#EF5350"):"var(--brd)"}`,fontSize:16,fontWeight:600,background:checked?(correct?"#1B5E2018":"#B71C1C18"):"var(--card)",color:"var(--txt)",outline:"none",boxSizing:"border-box",fontFamily:"inherit"}}/>
+  {!checked&&textAns.trim()&&<button onClick={()=>{setChecked(true);const c=textAns.trim().toLowerCase()===ex.answer.toLowerCase();setCorrect(c);if(c)setScore(s=>s+1);}} style={{...sBtn,background:C,color:"#fff",marginTop:14}}>Vérifier</button>}
+  {checked&&resBox(correct,ex.answer)}
+  {nxtBtn}
+</div>;
+
+// ═══ TRANSLATE ═══
+if(ex.type==="translate") return <div>{hdr}
+  <div style={{...sCard,marginBottom:14}}>
+    <p style={{fontSize:13,color:"var(--dim)",margin:"0 0 4px",fontWeight:600}}>🔄 Traduis :</p>
+    <div style={{display:"flex",alignItems:"center",gap:8}}>
+      <p style={{fontSize:19,fontWeight:800,color:"var(--txt)",margin:0,flex:1}}>{ex.nl}</p>
+      <Sp text={ex.nl} color={C}/>
+    </div>
+  </div>
+  <input type="text" value={textAns} onChange={e=>setTextAns(e.target.value)} disabled={checked} placeholder="En français..."
+    onKeyDown={e=>{if(e.key==="Enter"&&textAns.trim()&&!checked){setChecked(true);const u=textAns.trim().toLowerCase(),a=ex.fr.toLowerCase();const c=u===a||a.includes(u)||u.includes(a);setCorrect(c);if(c)setScore(s=>s+1);}}}
+    style={{width:"100%",padding:"14px 16px",borderRadius:14,border:`2px solid ${checked?(correct?"#4CAF50":"#EF5350"):"var(--brd)"}`,fontSize:16,fontWeight:600,background:"var(--card)",color:"var(--txt)",outline:"none",boxSizing:"border-box",fontFamily:"inherit"}}/>
+  {!checked&&textAns.trim()&&<button onClick={()=>{setChecked(true);const u=textAns.trim().toLowerCase(),a=ex.fr.toLowerCase();const c=u===a||a.includes(u)||u.includes(a);setCorrect(c);if(c)setScore(s=>s+1);}} style={{...sBtn,background:C,color:"#fff",marginTop:14}}>Vérifier</button>}
+  {checked&&<div style={{...sCard,marginTop:10,borderColor:correct?"#4CAF50":"#EF5350"}}>
+    <span>{correct?"✅":"❌"} </span><span style={{fontWeight:700,color:correct?"#4CAF50":"#EF5350"}}>{correct?"Correct":"Pas tout à fait"}</span>
+    <p style={{color:"var(--dim)",fontSize:13,margin:"4px 0 0"}}>Attendu : <strong style={{color:"var(--txt)"}}>{ex.fr}</strong></p>
+  </div>}
+  {nxtBtn}
+</div>;
+
+// ═══ PAIR MATCHING ═══
+if(ex.type==="pair"){
+  const left=ex.pairs.map(([a],i)=>({t:a,id:i,s:"l"}));
+  if(shuffledRight.length===0) return <div>{hdr}<p style={{color:"var(--dim)"}}>Chargement...</p></div>;
+  const matched=id=>pairDone.includes(id);
+  const handleP=item=>{
+    if(matched(item.id))return;
+    if(!pairSel){setPairSel(item);return;}
+    if(pairSel.s===item.s){setPairSel(item);return;}
+    if(pairSel.id===item.id){
+      const nd=[...pairDone,item.id];setPairDone(nd);setPairSel(null);
+      if(nd.length===ex.pairs.length){setChecked(true);setCorrect(true);setScore(s=>s+1);}
+    } else setPairSel(null);
+  };
+  return <div>{hdr}
+    <p style={{fontSize:14,color:"var(--dim)",fontWeight:600,margin:"0 0 12px"}}>🔗 Associe les paires :</p>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+      <div style={{display:"flex",flexDirection:"column",gap:6}}>
+        {left.map(it=><button key={`l${it.id}`} onClick={()=>handleP(it)}
+          style={{padding:"11px 10px",borderRadius:12,border:`2px solid ${matched(it.id)?"#4CAF50":pairSel?.id===it.id&&pairSel?.s==="l"?C:"var(--brd)"}`,
+          background:matched(it.id)?"#1B5E2020":pairSel?.id===it.id&&pairSel?.s==="l"?C+"20":"var(--card)",
+          color:matched(it.id)?"#4CAF50":"var(--txt)",fontSize:14,fontWeight:600,cursor:"pointer",textAlign:"center",opacity:matched(it.id)?0.6:1}}>
+          {it.t}
+        </button>)}
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:6}}>
+        {shuffledRight.map(it=><button key={`r${it.id}`} onClick={()=>handleP(it)}
+          style={{padding:"11px 10px",borderRadius:12,border:`2px solid ${matched(it.id)?"#4CAF50":pairSel?.id===it.id&&pairSel?.s==="r"?C:"var(--brd)"}`,
+          background:matched(it.id)?"#1B5E2020":pairSel?.id===it.id&&pairSel?.s==="r"?C+"20":"var(--card)",
+          color:matched(it.id)?"#4CAF50":"var(--txt)",fontSize:14,fontWeight:600,cursor:"pointer",textAlign:"center",opacity:matched(it.id)?0.6:1}}>
+          {it.t}
+        </button>)}
+      </div>
+    </div>
+    {checked&&<div style={{...sCard,marginTop:12,borderColor:"#4CAF50",background:"#1B5E2020"}}>✅ <span style={{fontWeight:700,color:"#4CAF50"}}>Toutes les paires trouvées !</span></div>}
+    {nxtBtn}
+  </div>;
+}
+
+// ═══ CONJUGATION ═══
+if(ex.type==="conj"){
+  const forms=Object.entries(ex.forms);
+  const allFilled=forms.every(([k])=>conjAns[k]?.trim());
+  const checkC=()=>{setChecked(true);const ok=forms.every(([k,v])=>conjAns[k]?.trim().toLowerCase()===v.toLowerCase());setCorrect(ok);if(ok)setScore(s=>s+1);};
+  return <div>{hdr}
+    <div style={{...sCard,marginBottom:14}}>
+      <p style={{fontSize:13,color:"var(--dim)",margin:"0 0 4px",fontWeight:600}}>✏️ Conjugue :</p>
+      <div style={{display:"flex",alignItems:"center",gap:8}}>
+        <p style={{fontSize:22,fontWeight:800,color:C,margin:0}}>{ex.verb}</p>
+        <Sp text={ex.verb} color={C}/>
+      </div>
+    </div>
+    <div style={{display:"flex",flexDirection:"column",gap:8}}>
+      {forms.map(([p,f])=><div key={p} style={{display:"flex",alignItems:"center",gap:8}}>
+        <span style={{width:80,fontSize:14,fontWeight:700,color:"var(--txt)",flexShrink:0}}>{p}</span>
+        <input type="text" value={conjAns[p]||""} onChange={e=>setConjAns(a=>({...a,[p]:e.target.value}))} disabled={checked}
+          placeholder="..." style={{flex:1,padding:"10px 12px",borderRadius:10,border:`2px solid ${checked?(conjAns[p]?.trim().toLowerCase()===f.toLowerCase()?"#4CAF50":"#EF5350"):"var(--brd)"}`,fontSize:15,fontWeight:600,background:"var(--card)",color:"var(--txt)",outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/>
+        {checked&&<span>{conjAns[p]?.trim().toLowerCase()===f.toLowerCase()?"✅":"❌"}</span>}
+      </div>)}
+    </div>
+    {checked&&!correct&&<div style={{...sCard,marginTop:10}}>
+      <p style={{fontSize:13,color:"var(--dim)",margin:0}}>{forms.map(([k,v])=>`${k} → ${v}`).join(", ")}</p>
+    </div>}
+    {!checked&&allFilled&&<button onClick={checkC} style={{...sBtn,background:C,color:"#fff",marginTop:14}}>Vérifier</button>}
+    {nxtBtn}
+  </div>;
+}
+
+return <div>{hdr}<p style={{color:"var(--dim)"}}>Type inconnu</p>{nxtBtn}</div>;
+```
+
+};
+
+// ─── HOME ──────
+const renderHome=()=><div style={{padding:“0 20px 100px”}}>
+<div style={{paddingTop:16,display:“flex”,justifyContent:“space-between”,alignItems:“center”}}>
+<div>
+<h1 style={{fontSize:26,fontWeight:900,color:“var(–txt)”,margin:0,fontFamily:”‘Nunito’,sans-serif”}}>Vlaams Leren <span style={{fontSize:18}}>🇧🇪</span></h1>
+<p style={{color:“var(–dim)”,fontSize:12,margin:“2px 0 0”}}>{allVocab.length} mots · {totalL} leçons · Sentence builder</p>
+</div>
+<div style={{background:”#FF6B35”,borderRadius:14,padding:“7px 13px”,display:“flex”,alignItems:“center”,gap:5}}>
+<span style={{fontSize:14}}>⚡</span><span style={{fontWeight:800,color:”#fff”,fontSize:14}}>{progress.xp||0}</span>
+</div>
+</div>
+<div style={{...sCard,marginTop:16}}>
+<div style={{display:“flex”,justifyContent:“space-between”,marginBottom:10}}>
+<span style={{fontWeight:700,color:“var(–txt)”,fontSize:14}}>Progression</span>
+<span style={{color:”#FF6B35”,fontWeight:700,fontSize:14}}>{pct}%</span>
+</div>
+<div style={{background:“var(–bg2)”,borderRadius:8,height:8,overflow:“hidden”}}>
+<div style={{background:“linear-gradient(90deg,#FF6B35,#FF9F43)”,height:“100%”,width:`${pct}%`,borderRadius:8,transition:“width 0.5s”}}/>
+</div>
+<div style={{display:“flex”,justifyContent:“space-around”,marginTop:14}}>
+{[{v:`${doneL}/${totalL}`,l:“Leçons”,i:“📘”},{v:`${allVocab.length}+`,l:“Mots”,i:“💬”},{v:“4”,l:“Niveaux”,i:“📊”}].map((s,i)=>
+<div key={i} style={{textAlign:“center”}}><div style={{fontSize:18}}>{s.i}</div><div style={{fontWeight:800,fontSize:17,color:“var(–txt)”}}>{s.v}</div><div style={{color:“var(–dim)”,fontSize:11}}>{s.l}</div></div>
+)}
+</div>
+</div>
+{LEVELS.map(lv=>{
+const ls=LESSONS.filter(l=>l.lvl===lv.id);const dn=ls.filter(l=>progress.done?.includes(l.id)).length;
+return <div key={lv.id} style={{marginTop:20}}>
+<button onClick={()=>setSelLevel(selLevel===lv.id?null:lv.id)} style={{display:“flex”,alignItems:“center”,gap:12,width:“100%”,background:“none”,border:“none”,cursor:“pointer”,padding:0,textAlign:“left”}}>
+<div style={{width:44,height:44,borderRadius:13,background:lv.color+“22”,display:“flex”,alignItems:“center”,justifyContent:“center”,fontSize:22,flexShrink:0}}>{lv.icon}</div>
+<div style={{flex:1}}>
+<div style={{fontWeight:800,fontSize:15,color:“var(–txt)”}}>{lv.id} — {lv.name}</div>
+<div style={{color:“var(–dim)”,fontSize:12}}>{lv.desc} · {dn}/{ls.length}</div>
+<div style={{background:“var(–bg2)”,borderRadius:6,height:4,marginTop:6,overflow:“hidden”}}><div style={{background:lv.color,height:“100%”,width:`${Math.round(dn/ls.length*100)}%`,borderRadius:6}}/></div>
+</div>
+<span style={{color:“var(–dim)”,fontSize:18,transform:selLevel===lv.id?“rotate(90deg)”:“rotate(0)”,transition:“transform 0.2s”}}>›</span>
+</button>
+{selLevel===lv.id&&<div style={{display:“flex”,flexDirection:“column”,gap:6,marginTop:10,marginLeft:14,borderLeft:`3px solid ${lv.color}30`,paddingLeft:14}}>
+{ls.map(lesson=>{
+const isDone=progress.done?.includes(lesson.id);
+return <button key={lesson.id} onClick={()=>startLesson(lesson)}
+style={{display:“flex”,alignItems:“center”,gap:10,background:“var(–card)”,border:`1px solid ${isDone?lv.color:"var(--brd)"}`,borderRadius:14,padding:“12px 14px”,cursor:“pointer”,textAlign:“left”,width:“100%”}}>
+<span style={{fontSize:20,width:28,textAlign:“center”}}>{isDone?“✅”:lesson.icon}</span>
+<div style={{flex:1}}>
+<div style={{fontWeight:700,fontSize:14,color:“var(–txt)”}}>{lesson.title}</div>
+<div style={{color:“var(–dim)”,fontSize:11,marginTop:1}}>{lesson.titleNl} · {(lesson.drills?.length||0)+4} ex.</div>
+</div>
+</button>;
+})}
+</div>}
+</div>;
+})}
+
+  </div>;
+
+// ─── RESULT ────
+const renderResult=()=><div style={{padding:“40px 20px 100px”,textAlign:“center”}}>
+<div style={{fontSize:60,marginBottom:16}}>{score>=total*0.7?“🎉”:score>=total*0.4?“💪”:“📚”}</div>
+<h2 style={{fontSize:24,fontWeight:900,color:“var(–txt)”,margin:“0 0 8px”,fontFamily:”‘Nunito’,sans-serif”}}>
+{score>=total*0.7?“Uitstekend!”:score>=total*0.4?“Goed geprobeerd!”:“Blijf oefenen!”}
+</h2>
+<p style={{color:“var(–dim)”,fontSize:17,margin:“0 0 4px”}}>{score} / {total} correct</p>
+<p style={{color:C,fontSize:14,fontWeight:700}}>+{score*10+20} XP</p>
+{selLesson?.grammar&&<div style={{…sCard,marginTop:20,textAlign:“left”}}>
+<p style={{fontSize:12,color:C,fontWeight:700,margin:“0 0 6px”,textTransform:“uppercase”,letterSpacing:0.5}}>📐 Rappel</p>
+<p style={{fontSize:13,color:“var(–txt)”,margin:0,lineHeight:1.7}}>{selLesson.grammar}</p>
+</div>}
+<div style={{display:“flex”,gap:8,marginTop:24}}>
+<button onClick={()=>startLesson(selLesson)} style={{…sBtn,flex:1,background:“var(–card)”,color:C,border:`2px solid ${C}`}}>Recommencer</button>
+<button onClick={()=>{setScreen(“home”);setSelLesson(null);}} style={{…sBtn,flex:1,background:C,color:”#fff”}}>Continuer</button>
+</div>
+
+  </div>;
+
+// ─── FLASHCARDS ────
+const renderFlash=()=><div style={{padding:“0 20px 100px”}}>
+<h2 style={{fontSize:22,fontWeight:900,color:“var(–txt)”,paddingTop:16,margin:“0 0 14px”,fontFamily:”‘Nunito’,sans-serif”}}>⚡ Flashcards & Dico</h2>
+<div style={{display:“flex”,gap:6,marginBottom:16,overflowX:“auto”,paddingBottom:4}}>
+{fcCats.map((c,i)=><button key={i} onClick={()=>{setFcCat(i);setFcIdx(0);setFcFlip(false);}}
+style={{background:fcCat===i?”#FF6B35”:“var(–card)”,color:fcCat===i?”#fff”:“var(–dim)”,border:fcCat===i?“none”:“1px solid var(–brd)”,borderRadius:10,padding:“7px 13px”,fontSize:12,fontWeight:700,cursor:“pointer”,whiteSpace:“nowrap”,flexShrink:0}}>
+{c.n} ({(c.f!==null?allVocab.filter(w=>w.lvl===c.f):allVocab).length})
+</button>)}
+</div>
+{fcCard&&<div onClick={()=>setFcFlip(f=>!f)}
+style={{background:fcFlip?”#FF6B35”:“var(–card)”,borderRadius:22,padding:“40px 24px”,minHeight:200,display:“flex”,flexDirection:“column”,alignItems:“center”,justifyContent:“center”,cursor:“pointer”,border:fcFlip?“none”:“1px solid var(–brd)”,transition:“all 0.3s”,boxShadow:“0 6px 24px rgba(0,0,0,0.12)”}}>
+<div style={{fontSize:12,fontWeight:700,color:fcFlip?“rgba(255,255,255,0.7)”:“var(–dim)”,textTransform:“uppercase”,letterSpacing:1,marginBottom:10}}>{fcFlip?“Français”:“Nederlands”}</div>
+<div style={{fontSize:26,fontWeight:900,color:fcFlip?”#fff”:“var(–txt)”,textAlign:“center”,fontFamily:”‘Nunito’,sans-serif”}}>{fcFlip?fcCard.fr:fcCard.nl}</div>
+{!fcFlip&&<div style={{marginTop:14}}><Sp text={fcCard.nl}/></div>}
+<div style={{fontSize:12,color:fcFlip?“rgba(255,255,255,0.5)”:“var(–dim)”,marginTop:14}}>Tap pour retourner</div>
+</div>}
+<div style={{display:“flex”,gap:10,marginTop:18}}>
+<button onClick={()=>{setFcIdx(i=>(i-1+fcPool.length)%fcPool.length);setFcFlip(false);}} style={{flex:1,padding:“12px”,background:“var(–card)”,border:“1px solid var(–brd)”,borderRadius:14,fontSize:20,cursor:“pointer”,color:“var(–txt)”}}>←</button>
+<div style={{flex:2,display:“flex”,alignItems:“center”,justifyContent:“center”,color:“var(–dim)”,fontWeight:600,fontSize:14}}>{(fcIdx%fcPool.length)+1}/{fcPool.length}</div>
+<button onClick={()=>{setFcIdx(i=>(i+1)%fcPool.length);setFcFlip(false);}} style={{flex:1,padding:“12px”,background:”#FF6B35”,border:“none”,borderRadius:14,fontSize:20,cursor:“pointer”,color:”#fff”}}>→</button>
+</div>
+<div style={{marginTop:24}}>
+<h3 style={{fontSize:16,fontWeight:700,color:“var(–txt)”,margin:“0 0 10px”}}>🔍 Dictionnaire</h3>
+<input type=“text” value={search} onChange={e=>setSearch(e.target.value)} placeholder=“Chercher NL ou FR…”
+style={{width:“100%”,padding:“12px 16px”,borderRadius:14,border:“1px solid var(–brd)”,fontSize:14,background:“var(–card)”,color:“var(–txt)”,outline:“none”,boxSizing:“border-box”,fontFamily:“inherit”}}/>
+{searched.length>0&&<div style={{marginTop:8,maxHeight:300,overflowY:“auto”,borderRadius:14,border:“1px solid var(–brd)”}}>
+{searched.map((w,i)=><div key={i} style={{padding:“10px 14px”,borderBottom:“1px solid var(–brd)”,background:“var(–card)”,display:“flex”,justifyContent:“space-between”,alignItems:“center”}}>
+<div style={{display:“flex”,alignItems:“center”,gap:8}}>
+<Sp text={w.nl}/>
+<div><span style={{fontWeight:700,color:“var(–txt)”,fontSize:14}}>{w.nl}</span><span style={{color:“var(–dim)”,fontSize:13}}> — {w.fr}</span></div>
+</div>
+<span style={{fontSize:10,color:“var(–dim)”,background:“var(–bg2)”,padding:“2px 7px”,borderRadius:6}}>{“A0 A1 A2 B1”.split(” “)[w.lvl]}</span>
+</div>)}
+</div>}
+</div>
+
+  </div>;
+
+// ─── VERBS TAB ────
+const startVerbQuiz=()=>{
+const v=VERBS[Math.floor(Math.random()*VERBS.length)];
+const t=[“pr”,“pa”,“fu”][Math.floor(Math.random()*3)];
+setVerbQuizVerb(v);setVerbQuizTense(t);setVerbPractice({});setVerbChecked(false);setVerbCorrect(false);
+};
+const renderVerbs=()=>{
+const AC=”#4ECDC4”;
+// Practice mode
+if(verbMode===“practice”){
+if(!verbQuizVerb){startVerbQuiz();return <div style={{padding:“0 20px 100px”}}><p style={{color:“var(–dim)”,paddingTop:60}}>Chargement…</p></div>;}
+const v=verbQuizVerb;const t=verbQuizTense;
+const tForms=getVerbForms(v,t);
+const forms=tForms?Object.entries(tForms).filter(([k])=>PRONOUNS.includes(k)):[];
+const allFilled=forms.every(([k])=>verbPractice[k]?.trim());
+const checkV=()=>{setVerbChecked(true);const ok=forms.every(([k,val])=>{const ans=verbPractice[k]?.trim().toLowerCase();const correct=val.toLowerCase();return ans===correct||correct.split(”/”).some(c=>ans===c.trim());});setVerbCorrect(ok);
+setVerbScore(s=>({total:s.total+1,correct:s.correct+(ok?1:0)}));};
+return <div style={{padding:“0 20px 100px”}}>
+<div style={{paddingTop:16,display:“flex”,justifyContent:“space-between”,alignItems:“center”,marginBottom:16}}>
+<button onClick={()=>{setVerbMode(“browse”);setVerbScore({total:0,correct:0});}} style={{background:“none”,border:“none”,color:AC,fontSize:14,fontWeight:600,cursor:“pointer”,padding:0}}>← Retour</button>
+<span style={{color:AC,fontWeight:700,fontSize:14}}>✓ {verbScore.correct}/{verbScore.total}</span>
+</div>
+<div style={{...sCard,marginBottom:16}}>
+<p style={{fontSize:13,color:“var(–dim)”,margin:“0 0 4px”,fontWeight:600}}>✏️ Conjugue au {TENSE_LABELS[t]} :</p>
+<div style={{display:“flex”,alignItems:“center”,gap:8}}>
+<p style={{fontSize:24,fontWeight:900,color:AC,margin:0}}>{v.inf}</p>
+<span style={{color:“var(–dim)”,fontSize:14}}>({v.fr})</span>
+<Sp text={v.inf} color={AC}/>
+</div>
+</div>
+<div style={{display:“flex”,flexDirection:“column”,gap:8}}>
+{forms.map(([p,f])=><div key={p} style={{display:“flex”,alignItems:“center”,gap:8}}>
+<span style={{width:56,fontSize:13,fontWeight:700,color:“var(–txt)”,flexShrink:0}}>{p}</span>
+<input type=“text” value={verbPractice[p]||””} onChange={e=>setVerbPractice(a=>({…a,[p]:e.target.value}))} disabled={verbChecked}
+placeholder=”…” style={{flex:1,padding:“10px 12px”,borderRadius:10,border:`2px solid ${verbChecked?(verbPractice[p]?.trim().toLowerCase()===f.toLowerCase()?"#4CAF50":"#EF5350"):"var(--brd)"}`,fontSize:15,fontWeight:600,background:“var(–card)”,color:“var(–txt)”,outline:“none”,fontFamily:“inherit”,boxSizing:“border-box”}}/>
+{verbChecked&&<span style={{fontSize:14,flexShrink:0}}>{(()=>{const ans=verbPractice[p]?.trim().toLowerCase();const cor=f.toLowerCase();return ans===cor||cor.split(”/”).some(c=>ans===c.trim());})()?“✅”:“❌”}</span>}
+</div>)}
+</div>
+{verbChecked&&!verbCorrect&&<div style={{...sCard,marginTop:12}}>
+<p style={{fontSize:13,color:“var(–dim)”,margin:0,lineHeight:1.7}}>{forms.map(([k,v])=><span key={k}><strong style={{color:“var(–txt)”}}>{k}</strong> → {v}<br/></span>)}</p>
+</div>}
+{!verbChecked&&allFilled&&<button onClick={checkV} style={{…sBtn,background:AC,color:”#fff”,marginTop:14}}>Vérifier</button>}
+{verbChecked&&<button onClick={startVerbQuiz} style={{…sBtn,background:AC,color:”#fff”,marginTop:12}}>Verbe suivant →</button>}
+</div>;
+}
+
+```
+// Browse mode - verb selected
+if(verbSel){
+  const v=verbSel;
+  return <div style={{padding:"0 20px 100px"}}>
+    <button onClick={()=>setVerbSel(null)} style={{background:"none",border:"none",color:AC,fontSize:14,fontWeight:600,cursor:"pointer",padding:"16px 0 8px"}}>← Retour</button>
+    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
+      <div style={{fontSize:28,fontWeight:900,color:AC,fontFamily:"'Nunito',sans-serif"}}>{v.inf}</div>
+      <span style={{color:"var(--dim)",fontSize:15}}>= {v.fr}</span>
+      <Sp text={v.inf} color={AC}/>
+    </div>
+    {/* Tense tabs */}
+    <div style={{display:"flex",gap:6,marginBottom:16,flexWrap:"wrap"}}>
+      {["pr","pa","fu","pf"].map(t=>{
+        if(t==="pf"&&!v.pf) return null;
+        return <button key={t} onClick={()=>setVerbTense(t)} style={{background:verbTense===t?AC:"var(--card)",color:verbTense===t?"#fff":"var(--dim)",border:verbTense===t?"none":"1px solid var(--brd)",borderRadius:10,padding:"7px 13px",fontSize:12,fontWeight:700,cursor:"pointer"}}>{TENSE_LABELS[t]}</button>;
+      })}
+    </div>
+    {/* Conjugation table */}
+    {(verbTense==="pr"||verbTense==="pa"||verbTense==="fu")&&(()=>{
+      const forms=getVerbForms(v,verbTense);
+      if(!forms) return null;
+      const entries=Object.entries(forms);
+      return <div style={{...sCard}}>
+      <div style={{display:"flex",flexDirection:"column",gap:1}}>
+        {entries.map(([p,f],i)=>(
+          <div key={p} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",borderBottom:i<entries.length-1?"1px solid var(--brd)":"none"}}>
+            <span style={{fontWeight:700,color:"var(--dim)",fontSize:14}}>{p}</span>
+            <div style={{display:"flex",alignItems:"center",gap:6}}>
+              <span style={{fontWeight:800,color:"var(--txt)",fontSize:15}}>{f}</span>
+              <Sp text={`${p.replace("hij/zij","hij").replace("gij 🇧🇪","gij")} ${f}`} color={AC}/>
+            </div>
+          </div>
+        ))}
+      </div>
+      {verbTense==="fu"&&<p style={{fontSize:12,color:AC,margin:"12px 0 0",fontStyle:"italic"}}>💡 Futur = zullen (conjugué) + infinitif à la fin</p>}
+    </div>;})()}
+    {verbTense==="pf"&&v.pf&&<div style={{...sCard}}>
+      <p style={{fontSize:13,color:"var(--dim)",margin:"0 0 10px"}}>Auxiliaire + participe passé :</p>
+      <div style={{display:"flex",flexDirection:"column",gap:1}}>
+        {PRONOUNS.map((p,i)=>{
+          const aux=v.pf[0]==="zijn"?{ik:"ben",jij:"bent","hij/zij":"is",wij:"zijn",jullie:"zijn",zij:"zijn"}:{ik:"heb",jij:"hebt","hij/zij":"heeft",wij:"hebben",jullie:"hebben",zij:"hebben"};
+          return <div key={p} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",borderBottom:i<5?"1px solid var(--brd)":"none"}}>
+            <span style={{fontWeight:700,color:"var(--dim)",fontSize:14}}>{p}</span>
+            <div style={{display:"flex",alignItems:"center",gap:6}}>
+              <span style={{fontWeight:800,color:"var(--txt)",fontSize:15}}>{aux[p]} <span style={{color:AC}}>{v.pf[1]}</span></span>
+              <Sp text={`${p.replace("hij/zij","hij")} ${aux[p]} ${v.pf[1]}`} color={AC}/>
+            </div>
+          </div>;
+        })}
+      </div>
+    </div>}
+    {verbTense==="pf"&&!v.pf&&<div style={{...sCard}}><p style={{color:"var(--dim)",margin:0}}>Ce verbe n'a pas de participe passé usuel.</p></div>}
+  </div>;
+}
+
+// Browse mode - list
+return <div style={{padding:"0 20px 100px"}}>
+  <div style={{paddingTop:16,display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+    <h2 style={{fontSize:22,fontWeight:900,color:"var(--txt)",margin:0,fontFamily:"'Nunito',sans-serif"}}>📖 Verbes</h2>
+    <button onClick={()=>{setVerbMode("practice");startVerbQuiz();}} style={{background:AC,border:"none",borderRadius:12,padding:"8px 16px",color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer"}}>🎯 S'entraîner</button>
+  </div>
+  <p style={{color:"var(--dim)",fontSize:12,margin:"0 0 14px"}}>{VERBS.length} verbes · Présent, passé, futur, participe · 🔊 audio</p>
+  {/* Category filter */}
+  <div style={{display:"flex",gap:6,marginBottom:14,overflowX:"auto",paddingBottom:4}}>
+    <button onClick={()=>setVerbCat(null)} style={{background:verbCat===null?AC:"var(--card)",color:verbCat===null?"#fff":"var(--dim)",border:verbCat===null?"none":"1px solid var(--brd)",borderRadius:10,padding:"7px 12px",fontSize:12,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>Tous</button>
+    {VERB_CATS.map(c=><button key={c} onClick={()=>setVerbCat(c)} style={{background:verbCat===c?AC:"var(--card)",color:verbCat===c?"#fff":"var(--dim)",border:verbCat===c?"none":"1px solid var(--brd)",borderRadius:10,padding:"7px 12px",fontSize:12,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>{VERB_CAT_LABELS[c]}</button>)}
+  </div>
+  {/* Verb list */}
+  <div style={{display:"flex",flexDirection:"column",gap:6}}>
+    {VERBS.filter(v=>!verbCat||v.cat===verbCat).map((v,i)=>(
+      <button key={i} onClick={()=>{setVerbSel(v);setVerbTense("pr");}}
+        style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:"var(--card)",border:"1px solid var(--brd)",borderRadius:14,padding:"12px 14px",cursor:"pointer",textAlign:"left",width:"100%"}}>
+        <div>
+          <span style={{fontWeight:800,fontSize:15,color:"var(--txt)"}}>{v.inf}</span>
+          <span style={{color:"var(--dim)",fontSize:13,marginLeft:8}}>= {v.fr}</span>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:6}}>
+          <span style={{fontSize:10,color:AC,background:AC+"18",padding:"2px 8px",borderRadius:6,fontWeight:600}}>{VERB_CAT_LABELS[v.cat]}</span>
+          <span style={{color:"var(--dim)",fontSize:16}}>›</span>
+        </div>
+      </button>
+    ))}
+  </div>
+</div>;
+```
+
+};
+
+const nav=[{id:“home”,icon:“🏠”,label:“Accueil”},{id:“verbs”,icon:“📖”,label:“Verbes”},{id:“flash”,icon:“⚡”,label:“Dico”},{id:“profile”,icon:“👤”,label:“Profil”}];
+
+return <div style={{fontFamily:”‘Nunito’,-apple-system,sans-serif”,minHeight:“100vh”,background:“var(–bg)”,maxWidth:430,margin:“0 auto”,position:“relative”}}>
+<style>{`@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap'); :root{--bg:#0D0D12;--bg2:#1A1A24;--card:#16161F;--brd:#252535;--txt:#EEEEF0;--dim:#7777A0;} @media(prefers-color-scheme:light){:root{--bg:#F4F4F8;--bg2:#E8E8F0;--card:#FFFFFF;--brd:#D8D8E4;--txt:#1A1A2E;--dim:#6B6B85;}} *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;} body{margin:0;padding:0;background:var(--bg);overscroll-behavior:none;} input,button{font-family:'Nunito',sans-serif;} ::-webkit-scrollbar{width:0;} @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}`}</style>
+<div style={{paddingBottom:72,animation:“fadeIn 0.25s ease”}}>
+{screen===“home”&&renderHome()}
+{screen===“exercise”&&<div style={{padding:“16px 20px 100px”}}>{renderEx()}</div>}
+{screen===“result”&&renderResult()}
+{screen===“flash”&&renderFlash()}
+{screen===“verbs”&&renderVerbs()}
+{screen===“profile”&&<div style={{padding:“0 20px 100px”}}>
+<h2 style={{fontSize:22,fontWeight:900,color:“var(–txt)”,paddingTop:16,margin:“0 0 16px”,fontFamily:”‘Nunito’,sans-serif”}}>👤 Profil</h2>
+<div style={{background:“linear-gradient(135deg,#FF6B35,#FF9F43)”,borderRadius:20,padding:“20px”,color:”#fff”}}>
+<div style={{display:“grid”,gridTemplateColumns:“1fr 1fr”,gap:12}}>
+{[{v:progress.xp||0,l:“XP”,i:“⚡”},{v:`${doneL}/${totalL}`,l:“Leçons”,i:“📘”},{v:`${pct}%`,l:“Progrès”,i:“📈”},{v:allVocab.length,l:“Mots”,i:“💬”}].map((s,i)=>
+<div key={i} style={{background:“rgba(255,255,255,0.15)”,borderRadius:14,padding:“12px”,textAlign:“center”}}>
+<div style={{fontSize:18}}>{s.i}</div><div style={{fontWeight:900,fontSize:20,marginTop:2}}>{s.v}</div><div style={{fontSize:11,opacity:0.8}}>{s.l}</div>
+</div>)}
+</div>
+</div>
+{LEVELS.map(lv=>{const ls=LESSONS.filter(l=>l.lvl===lv.id);const dn=ls.filter(l=>progress.done?.includes(l.id)).length;
+return <div key={lv.id} style={{…sCard,marginTop:8,display:“flex”,alignItems:“center”,gap:12}}>
+<span style={{fontSize:22}}>{lv.icon}</span>
+<div style={{flex:1}}><div style={{fontWeight:700,fontSize:14,color:“var(–txt)”}}>{lv.id} — {lv.name}</div>
+<div style={{background:“var(–bg2)”,borderRadius:6,height:5,marginTop:5,overflow:“hidden”}}><div style={{background:lv.color,height:“100%”,width:`${Math.round(dn/ls.length*100)}%`,borderRadius:6}}/></div></div>
+<span style={{color:lv.color,fontWeight:700,fontSize:13}}>{dn}/{ls.length}</span>
+</div>;})}
+<button onClick={async()=>{if(confirm(“Réinitialiser?”)){await save({done:[],xp:0});}}}
+style={{…sBtn,marginTop:20,background:“var(–card)”,color:”#EF5350”,border:“1px solid #EF5350”}}>Réinitialiser</button>
+</div>}
+</div>
+{screen!==“exercise”&&<div style={{position:“fixed”,bottom:0,left:“50%”,transform:“translateX(-50%)”,width:“100%”,maxWidth:430,background:“var(–card)”,borderTop:“1px solid var(–brd)”,display:“flex”,justifyContent:“space-around”,padding:“6px 0 max(env(safe-area-inset-bottom,8px),8px)”,zIndex:100}}>
+{nav.map(n=><button key={n.id} onClick={()=>setScreen(n.id)} style={{background:“none”,border:“none”,display:“flex”,flexDirection:“column”,alignItems:“center”,gap:2,cursor:“pointer”,padding:“4px 12px”}}>
+<span style={{fontSize:22,opacity:screen===n.id?1:0.4}}>{n.icon}</span>
+<span style={{fontSize:10,fontWeight:700,color:screen===n.id?”#FF6B35”:“var(–dim)”}}>{n.label}</span>
+</button>)}
+</div>}
+{screen===“exercise”&&<button onClick={()=>{setScreen(“home”);setSelLesson(null);}}
+style={{position:“fixed”,top:12,left:12,background:“var(–card)”,border:“1px solid var(–brd)”,borderRadius:12,padding:“8px 14px”,color:“var(–txt)”,fontSize:13,fontWeight:700,cursor:“pointer”,zIndex:100}}>✕</button>}
+
+  </div>;
+}
+
+ReactDOM.render(<App />, document.getElementById(‘root’));
+</script>
+
+<script>
+// Service Worker registration for offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    // Simple offline-first SW via data URI
+    const swCode = `
+      const CACHE = 'vlaams-v3';
+      self.addEventListener('install', e => { self.skipWaiting(); });
+      self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
+      self.addEventListener('fetch', e => {
+        e.respondWith(
+          caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+            const clone = res.clone();
+            caches.open(CACHE).then(c => c.put(e.request, clone));
+            return res;
+          }))
+        );
+      });
+    `;
+    const blob = new Blob([swCode], {type: 'application/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+  });
+}
+</script>
+
+</body>
+</html>
