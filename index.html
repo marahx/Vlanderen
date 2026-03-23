@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AZ-104 Study Hub — Azure Administrator</title>
+<meta name="description" content="Plateforme complète pour préparer la certification Microsoft Azure Administrator AZ-104">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☁️</text></svg>">
+<style>
+  body { margin: 0; padding: 0; background: #060a12; }
+  #root { width: 100%; height: 100vh; }
+  .loading-screen {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100vh; background: #060a12; color: #f0f4f8; font-family: system-ui;
+  }
+  .loading-screen h1 { font-size: 24px; margin-bottom: 8px; }
+  .loading-screen p { color: #5a7190; font-size: 14px; }
+  .loading-bar { width: 200px; height: 4px; background: #192a45; border-radius: 2px; margin-top: 24px; overflow: hidden; }
+  .loading-fill { height: 100%; width: 30%; background: linear-gradient(90deg, #3b82f6, #a855f7); border-radius: 2px; animation: load 1.5s ease-in-out infinite; }
+  @keyframes load { 0%{transform:translateX(-100%)} 100%{transform:translateX(400%)} }
+</style>
+</head>
+<body>
+<div id="root">
+  <div class="loading-screen">
+    <h1>☁️ AZ-104 Study Hub</h1>
+    <p>Chargement de la plateforme...</p>
+    <div class="loading-bar"><div class="loading-fill"></div></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+
+// ════════════════════════════════════════════════════════════════
+//  AZ-104 ULTIMATE STUDY PLATFORM — EXAM-READY EDITION
+//  Complete content to pass the certification
+// ════════════════════════════════════════════════════════════════
+
+const MODULES = [
+{
+id:"ident",title:"Identités & Gouvernance",icon:"🔐",weight:"15-20%",color:"#00D4AA",
+lessons:[
+{title:"Azure AD (Entra ID) — Fondamentaux",content:`**Azure Active Directory (Microsoft Entra ID)** est le service d'identité cloud de Microsoft.
+
+**AD on-prem vs Azure AD :**
+• AD on-prem : LDAP, Kerberos, OUs, GPOs, Forêts/Domaines
+• Azure AD : HTTP/HTTPS, OAuth 2.0, OpenID Connect, SAML, pas d'OUs, Conditional Access, structure flat
+
+**Tenant Azure AD :**
+• 1 tenant = 1 instance Azure AD = 1 organisation
+• Nom par défaut : monentreprise.onmicrosoft.com
+• Domaines personnalisés : vérification DNS (TXT ou MX record)
+• 1 tenant → PLUSIEURS subscriptions, mais 1 subscription → 1 SEUL tenant
+
+**Types d'utilisateurs :**
+1. **Member users (internes)** :
+   - Cloud-only : créés dans Azure AD directement
+   - Synced : depuis AD on-prem via Azure AD Connect
+   - Propriétés clés : UPN, Display Name, Usage Location (obligatoire pour licences)
+2. **Guest users (B2B)** :
+   - Utilisateurs externes invités
+   - Utilisent leur propre identité (Gmail, autre tenant, etc.)
+   - Accès limité par défaut
+   - Source : "Invited user" dans le portail
+
+**Opérations en masse (Bulk Operations) :**
+• Bulk create users : upload CSV
+• Bulk invite guests : upload CSV
+• Bulk delete : suppression en masse
+• Download users : export CSV
+• Format CSV avec colonnes obligatoires : Name, UPN, Initial password, etc.
+
+**Utilisateurs supprimés :**
+• Vont dans la "corbeille" (Deleted users)
+• Récupérables pendant 30 jours
+• Après 30 jours : suppression permanente
+
+**Licences :**
+• Assignables directement à un utilisateur OU via un groupe
+• L'attribution par groupe nécessite Azure AD Premium P1
+• Usage Location OBLIGATOIRE avant d'assigner une licence`},
+
+{title:"Groupes & Administrative Units",content:`**Types de groupes Azure AD :**
+
+**1. Security Groups :**
+• Pour les permissions (RBAC, accès apps, Conditional Access)
+• Membres possibles : users, devices, service principals, autres groupes
+• Utilisables dans les NSG (via ASG) et les policies
+
+**2. Microsoft 365 Groups :**
+• Pour la collaboration (Teams, SharePoint, Outlook partagé)
+• Membres : UNIQUEMENT des utilisateurs
+• PAS de devices, PAS de groupes imbriqués
+• Créent automatiquement : boîte mail, site SharePoint, Planner, OneNote
+
+**Types d'appartenance :**
+• **Assigned** : Ajout/retrait manuel
+• **Dynamic User** : Règles automatiques basées sur les propriétés utilisateur
+  Exemples de syntaxe :
+  user.department -eq "IT"
+  user.jobTitle -contains "Engineer"
+  user.city -eq "Brussels" -and user.companyName -eq "UCB"
+  user.accountEnabled -eq true
+• **Dynamic Device** : Règles basées sur les propriétés des appareils (Security Groups uniquement)
+  device.deviceOSType -eq "Windows"
+  device.displayName -startsWith "PC-"
+
+**⚠️ Règles d'examen sur les groupes :**
+• Dynamic = Azure AD Premium P1/P2 obligatoire
+• On NE PEUT PAS ajouter/retirer manuellement des membres dans un groupe dynamique
+• Un groupe est SOIT Assigned SOIT Dynamic, pas les deux
+• Microsoft 365 : PAS de Dynamic Device
+• Max 500 groupes dynamiques par tenant
+• Propriétaire ≠ Membre (un owner n'est pas forcément membre)
+• Nested groups (groupes dans des groupes) : possible pour Security, PAS pour M365
+
+**Administrative Units (AU) :**
+• Conteneurs pour déléguer l'administration d'un sous-ensemble d'objets
+• Comme une OU dans l'AD on-prem
+• Exemple : AU "Finance" contient les users du département Finance → le manager Finance a le rôle User Administrator sur cette AU uniquement
+• Nécessite Azure AD Premium P1+
+• Rôles assignables au niveau AU : User Admin, Groups Admin, Helpdesk Admin, License Admin, Password Admin, Authentication Admin
+• **Restricted Management AU** : les admins globaux ne peuvent PAS gérer les objets dans cette AU (protection supplémentaire)`},
+
+{title:"Azure AD Connect & Auth hybride",content:`**Azure AD Connect** synchronise ton AD on-prem avec Azure AD.
+
+**3 méthodes d'authentification hybride :**
+
+**1. Password Hash Synchronization (PHS)** ⭐ :
+• Le hash du mot de passe est synced vers Azure AD
+• Auth se fait dans le CLOUD
+• ✅ Le plus simple à configurer
+• ✅ Fonctionne même si AD on-prem est en panne
+• ✅ Nécessaire pour : Identity Protection, Leaked credentials detection
+• Commande : Set-MsolDirSyncEnabled -EnableDirSync $true
+
+**2. Pass-through Authentication (PTA)** :
+• Auth validée par ton AD ON-PREM via un agent
+• Le mot de passe ne quitte JAMAIS le réseau local
+• ❌ Si AD on-prem en panne → pas d'auth cloud
+• Minimum 1 agent PTA, recommandé 3 pour la HA
+• Port 443 sortant uniquement (pas d'ouverture de port entrant)
+
+**3. Federation (AD FS)** :
+• Ton serveur AD FS gère l'authentification
+• Le plus complexe (infra AD FS nécessaire)
+• Pour : smartcard auth, third-party MFA, certificats
+
+**Seamless SSO :**
+• Les users sont auto-connectés quand sur le réseau d'entreprise
+• Compatible avec PHS et PTA
+• Utilise Kerberos pour l'auth transparente
+• Nécessite un computer account AZUREADSSOACC dans l'AD on-prem
+
+**Azure AD Connect — Fonctionnalités détaillées :**
+• **Filtering** : Par OU, domaine, ou attribut → choisir quoi synchroniser
+• **Password writeback** : Changements de mot de passe cloud → écrits vers AD on-prem (nécessite P1)
+• **Device writeback** : Sync devices Azure AD → AD on-prem
+• **Group writeback** : Sync groupes M365 → AD on-prem
+• **Source Anchor** : Attribut qui lie l'objet on-prem à Azure AD (par défaut : ms-DS-ConsistencyGuid ou ObjectGUID)
+• **Staging Mode** : Serveur AD Connect de secours (n'exporte pas activement)
+
+**Azure AD Connect Cloud Sync :**
+• Version légère avec un agent simple
+• Configuration dans le cloud (pas de serveur dédié)
+• Supporte PLUSIEURS forêts AD déconnectées
+• Limitations : pas de device writeback, pas de PTA`},
+
+{title:"Conditional Access & MFA",content:`**Conditional Access** = le "if-then" de la sécurité Azure AD. Nécessite Azure AD Premium P1.
+
+**Structure d'une policy Conditional Access :**
+
+**Assignments (IF) — Qui est concerné ?**
+• Users and groups : tous les users, groupes spécifiques, rôles, guests
+• Cloud apps or actions : toutes les apps, apps spécifiques, user actions (register security info, etc.)
+• Conditions :
+  - Sign-in risk : low, medium, high (nécessite P2)
+  - User risk : low, medium, high (nécessite P2)
+  - Device platforms : iOS, Android, Windows, macOS, Linux
+  - Locations : Named locations (IP ranges, pays)
+  - Client apps : Browser, mobile apps, Exchange ActiveSync, other clients
+  - Device state : compliant, hybrid Azure AD joined
+
+**Access Controls (THEN) — Que faire ?**
+• **Grant** :
+  - Block access
+  - Grant access with conditions :
+    ✓ Require MFA
+    ✓ Require device to be compliant (Intune)
+    ✓ Require Hybrid Azure AD joined device
+    ✓ Require approved client app
+    ✓ Require app protection policy
+    ✓ Require password change
+  - Multiple controls : AND (toutes requises) ou OR (au moins une)
+• **Session** :
+  - App enforced restrictions
+  - Sign-in frequency (re-auth tous les X jours/heures)
+  - Persistent browser session
+
+**Named Locations :**
+• IP ranges (CIDR) : ex. 203.0.113.0/24
+• Countries/regions : basé sur l'IP géo
+• Trusted locations : marquées comme de confiance (bypass certaines policies)
+• Cas typique : "Require MFA sauf depuis le réseau d'entreprise" = trusted location
+
+**MFA (Multi-Factor Authentication) :**
+• Méthodes : Microsoft Authenticator, SMS, Voice call, OATH tokens (hardware/software), FIDO2 security keys, Windows Hello
+• **Per-user MFA** : Activé/désactivé par utilisateur (ancien mode, pas recommandé)
+• **Conditional Access MFA** : Recommandé — MFA requis selon les conditions
+• **Security Defaults** : MFA basique gratuit pour tous (pas de Conditional Access, juste des defaults)
+  ⚠️ Security Defaults ET Conditional Access sont mutuellement exclusifs !
+
+**SSPR (Self-Service Password Reset) :**
+• Permet aux users de réinitialiser leur mot de passe sans helpdesk
+• Nécessite au moins 1 méthode d'auth (email, phone, security questions, authenticator)
+• Modes : Disabled, Enabled (tous), Selected (groupes spécifiques)
+• **Combined registration** : MFA et SSPR configurés au même endroit
+• SSPR nécessite : Azure AD Premium P1 (pour les groupes sélectionnés) ou P2 (pour le risk-based)
+
+**Pour l'examen :** Les questions Conditional Access sont TRÈS fréquentes. Savoir construire une policy complète.`},
+
+{title:"RBAC — En profondeur",content:`**RBAC contrôle QUI peut faire QUOI sur QUELLES ressources Azure.**
+
+**Les 3 composants d'une Role Assignment :**
+1. Security Principal (Qui) : User, Group, Service Principal, Managed Identity
+2. Role Definition (Quoi) : Ensemble de permissions
+3. Scope (Où) : Management Group > Subscription > Resource Group > Resource
+
+**Rôles built-in fondamentaux :**
+• **Owner** : Toutes les actions + assigner des rôles
+• **Contributor** : Toutes les actions SAUF assigner des rôles
+• **Reader** : Lecture seule
+• **User Access Administrator** : Gérer UNIQUEMENT les role assignments
+
+**Rôles spécialisés importants pour l'examen :**
+• Virtual Machine Contributor : gérer VMs, pas le réseau/stockage associé
+• Network Contributor : gérer les réseaux
+• Storage Blob Data Reader/Contributor/Owner : accès aux DONNÉES blob (data plane)
+• Storage Account Contributor : gérer le compte de stockage (control plane, pas les données !)
+• Backup Contributor : gérer les backups (créer vault + policies)
+• Backup Operator : gérer les backups (pas créer de vault)
+• Monitoring Contributor : lire et modifier les paramètres de monitoring
+• Log Analytics Contributor : lire et écrire les données de log
+• Security Admin : voir et gérer les paramètres de sécurité
+
+**⚠️ RBAC Azure vs Rôles Azure AD — DIFFÉRENT :**
+• Rôles Azure AD : s'appliquent au TENANT (Global Admin, User Admin, etc.)
+• Rôles Azure RBAC : s'appliquent aux RESSOURCES Azure (Owner, Contributor, etc.)
+• Global Administrator ≠ Owner ! (mais un Global Admin peut s'auto-attribuer User Access Admin au root scope)
+
+**Custom Roles :**
+Définition JSON :
+{
+  "Name": "Custom VM Operator",
+  "Actions": ["Microsoft.Compute/virtualMachines/start/action", "Microsoft.Compute/virtualMachines/restart/action"],
+  "NotActions": [],
+  "DataActions": [],
+  "NotDataActions": [],
+  "AssignableScopes": ["/subscriptions/{sub-id}"]
+}
+• Actions : control plane (gérer les ressources)
+• DataActions : data plane (accéder aux données)
+• NotActions/NotDataActions : exclusions
+• AssignableScopes : où le rôle peut être assigné
+
+**Managed Identities :**
+• **System-assigned** : 1:1 avec la ressource, supprimée avec la ressource
+• **User-assigned** : Indépendante, partageable entre plusieurs ressources
+• Élimine les credentials dans le code
+• Exemple : Une VM avec un system-assigned MI peut lire un Key Vault sans mot de passe
+
+**Règles RBAC critiques :**
+• Les permissions sont ADDITIVES (pas de deny natif)
+• Héritage descendant : MG → Sub → RG → Resource
+• Deny Assignments existent mais sont rares (créés par Azure Blueprints)
+• Max 5000 role assignments par subscription
+• Max 5000 custom roles par tenant`},
+
+{title:"Azure Policy & Governance",content:`**Azure Policy force la conformité des ressources.**
+
+**Policy Definition :** Règle individuelle en JSON
+**Policy Initiative (Set) :** Groupe de policies
+**Policy Assignment :** Attacher à un scope
+
+**Les 7 effets :**
+1. **Deny** : BLOQUE la création/modification non conforme
+2. **Audit** : Laisse faire mais marque comme non conforme
+3. **Append** : Ajoute des propriétés (ex: ajouter un tag)
+4. **Modify** : Modifie les propriétés d'une ressource (ex: forcer un tag)
+5. **DeployIfNotExists (DINE)** : Déploie une ressource liée si absente
+6. **AuditIfNotExists** : Audit si une ressource liée est absente
+7. **Disabled** : Policy désactivée
+
+**Ordre d'évaluation :** Disabled → Append/Modify → Deny → Audit
+
+**Exemptions :**
+• Waiver : La ressource n'est pas conforme mais on l'accepte temporairement
+• Mitigated : La conformité est assurée par un autre moyen
+
+**Remediation :**
+• Pour DINE et Modify : les remediation tasks corrigent les ressources existantes
+• Nécessite un Managed Identity (créée automatiquement)
+• Les nouvelles ressources sont évaluées en temps réel
+• Les existantes nécessitent un scan (compliance scan ou remediation task)
+
+**Resource Locks :**
+• **ReadOnly** : Personne ne peut modifier (même Owner !)
+• **CanNotDelete** : Personne ne peut supprimer
+• Hérités par les enfants
+• Pour supprimer un lock : action explicite Microsoft.Authorization/locks/delete
+
+**Tags :**
+• Paires clé:valeur, max 50 par ressource
+• PAS hérités automatiquement
+• Azure Policy peut forcer : "Require tag", "Inherit tag from RG", "Add tag"
+• Utilisés pour : Cost tracking, Automation, Governance
+
+**Azure Blueprints :**
+• Package : ARM Templates + Policies + RBAC + Resource Groups
+• Versionnable, traçable
+• Locking : les ressources déployées peuvent être verrouillées
+
+**Management Groups :**
+• Organisent les subscriptions
+• Max 10 000 MGs par tenant, 6 niveaux de profondeur
+• Root MG : tous les MGs/subscriptions en dessous
+• Policies et RBAC se propagent vers le bas`},
+
+{title:"Subscriptions, Coûts & Key Vault",content:`**Hierarchy :** Tenant → Root MG → MGs → Subscriptions → RGs → Resources
+
+**Subscriptions :**
+• Frontière de facturation + frontière de confiance (1 tenant)
+• Transférable entre tenants (réinitialise le RBAC !)
+• Types : Pay-As-You-Go, Enterprise Agreement, CSP, Free Trial, Student
+• Quotas/limits par subscription (augmentables via support)
+
+**Cost Management :**
+• **Cost Analysis** : Visualiser les coûts (par resource, tag, location, etc.)
+• **Budgets** : Alertes à X% du budget (email, Action Group)
+• **Reservations** : 1 ou 3 ans, jusqu'à 72% d'économies (VMs, SQL, Storage)
+• **Savings Plans** : Engagement $/heure, plus flexible que les réservations
+• **Azure Advisor Cost** : VMs sous-utilisées, ressources orphelines, rightsizing
+
+**Azure Key Vault :**
+• Stocke : Secrets (mots de passe, connection strings), Keys (crypto), Certificates (SSL/TLS)
+• **Access control :**
+  - Vault access policy (ancien) : permissions par utilisateur/app
+  - Azure RBAC (recommandé) : rôles Key Vault Secrets Officer, Key Vault Crypto Officer, etc.
+• **Soft Delete** : Activé par défaut, récupérable pendant 7-90 jours
+• **Purge Protection** : Empêche la purge pendant la période de rétention
+• **Network Access** : Firewall, Service Endpoints, Private Endpoints
+• SKUs : Standard (software keys) et Premium (HSM-backed keys)
+• Utilisé par : Azure Disk Encryption, App Service certificates, VM secrets, etc.
+
+**Commandes importantes :**
+
+**PowerShell :**
+# Créer un user
+New-AzADUser -DisplayName "Thomas" -UserPrincipalName "thomas@contoso.com" -Password (ConvertTo-SecureString "P@ss1234" -AsPlainText -Force) -MailNickname "thomas"
+
+# Créer un groupe
+New-AzADGroup -DisplayName "IT Support" -MailNickname "itsupport"
+
+# Assigner un rôle RBAC
+New-AzRoleAssignment -ObjectId <user-id> -RoleDefinitionName "Contributor" -Scope "/subscriptions/<sub-id>"
+
+# Créer une policy assignment
+New-AzPolicyAssignment -Name "require-tag" -PolicyDefinition $policy -Scope "/subscriptions/<sub-id>"
+
+# Key Vault
+New-AzKeyVault -Name "mykeyvault" -ResourceGroupName "myRG" -Location "westeurope"
+Set-AzKeyVaultSecret -VaultName "mykeyvault" -Name "dbpassword" -SecretValue (ConvertTo-SecureString "P@ss" -AsPlainText -Force)
+
+**Azure CLI :**
+# Créer un user
+az ad user create --display-name "Thomas" --user-principal-name "thomas@contoso.com" --password "P@ss1234"
+
+# Assigner un rôle
+az role assignment create --assignee <user-id> --role "Contributor" --scope "/subscriptions/<sub-id>"
+
+# Key Vault
+az keyvault create --name "mykeyvault" --resource-group "myRG" --location "westeurope"
+az keyvault secret set --vault-name "mykeyvault" --name "dbpassword" --value "P@ss"`}
+],
+quizzes:[
+{q:"Quelle méthode d'auth hybride est la plus simple ?",options:["PTA","PHS","Federation","Seamless SSO"],correct:1,explanation:"PHS est le plus simple : hash synced au cloud, aucune infra supplémentaire."},
+{q:"Conditional Access nécessite quelle licence ?",options:["Azure AD Free","Azure AD P1","Azure AD P2","M365 E5 uniquement"],correct:1,explanation:"Conditional Access nécessite Azure AD Premium P1 minimum."},
+{q:"Security Defaults et Conditional Access peuvent coexister ?",options:["Oui","Non, mutuellement exclusifs","Oui si P2","Seulement en mode hybride"],correct:1,explanation:"Security Defaults et Conditional Access sont mutuellement exclusifs."},
+{q:"Un Resource Lock ReadOnly empêche qui ?",options:["Seulement les Reader","Seulement les Contributor","Tout le monde même Owner","Seulement les Guest"],correct:2,explanation:"ReadOnly bloque TOUT LE MONDE, même les Owners."},
+{q:"RBAC Azure vs Rôles Azure AD ?",options:["C'est la même chose","RBAC = ressources, Rôles AD = tenant","RBAC = tenant, Rôles AD = ressources","RBAC est deprecated"],correct:1,explanation:"RBAC s'applique aux ressources Azure. Les rôles Azure AD s'appliquent au tenant (Global Admin, etc.)."},
+{q:"Quel rôle accède aux DONNÉES des blobs ?",options:["Storage Account Contributor","Storage Blob Data Reader","Contributor","Reader"],correct:1,explanation:"Storage Blob Data Reader accède au data plane (les données). Storage Account Contributor gère le compte (control plane)."},
+{q:"Un groupe dynamique nécessite ?",options:["Azure AD Free","Azure AD P1 ou P2","Aucune licence","M365 E3"],correct:1,explanation:"Les groupes dynamiques nécessitent Azure AD Premium P1 ou P2."},
+{q:"Managed Identity System-assigned est supprimée quand ?",options:["Jamais","Quand la ressource est supprimée","Après 30 jours","Manuellement uniquement"],correct:1,explanation:"System-assigned MI est liée au cycle de vie de la ressource."},
+{q:"DeployIfNotExists fait quoi ?",options:["Bloque le déploiement","Déploie une ressource liée manquante","Supprime les non-conformes","Audit uniquement"],correct:1,explanation:"DINE déploie automatiquement une ressource si elle n'existe pas (ex: agent monitoring)."},
+{q:"Les tags sont hérités automatiquement ?",options:["Oui toujours","Non jamais","Seulement du RG","Avec RBAC Owner"],correct:1,explanation:"Les tags NE SONT PAS hérités. Utilise Azure Policy pour forcer l'héritage."},
+{q:"Combien d'utilisateurs dans la corbeille avant suppression définitive ?",options:["7 jours","14 jours","30 jours","90 jours"],correct:2,explanation:"Les utilisateurs supprimés sont récupérables pendant 30 jours."},
+{q:"SSPR nécessite quelle licence pour des groupes sélectionnés ?",options:["Free","P1","P2","E5"],correct:1,explanation:"SSPR pour des groupes spécifiques nécessite Azure AD Premium P1."},
+{q:"Key Vault Purge Protection ?",options:["Empêche la suppression","Empêche la purge pendant la rétention","Chiffre les secrets","Active le backup"],correct:1,explanation:"Purge Protection empêche la suppression définitive pendant la période de soft delete."},
+{q:"Quel effet Policy s'exécute en premier ?",options:["Deny","Audit","Disabled","Append"],correct:2,explanation:"Ordre : Disabled → Append/Modify → Deny → Audit."},
+{q:"Maximum de role assignments par subscription ?",options:["1000","2000","5000","Illimité"],correct:2,explanation:"5000 role assignments par subscription."},
+{q:"Named Locations dans Conditional Access servent à ?",options:["Localiser les VMs","Définir des IP/pays de confiance","Configurer le DNS","Gérer les regions Azure"],correct:1,explanation:"Named Locations définissent des IP ranges ou pays utilisés dans les policies Conditional Access."},
+{q:"Global Admin peut-il gérer les ressources Azure par défaut ?",options:["Oui, il a Owner partout","Non, seulement le tenant AD","Oui mais seulement en lecture","Seulement les subscriptions"],correct:1,explanation:"Global Admin gère le tenant Azure AD. Pour les ressources, il doit s'auto-attribuer User Access Admin au root scope."},
+{q:"Password writeback nécessite ?",options:["Azure AD Free","Azure AD P1","Azure AD P2","Enterprise Agreement"],correct:1,explanation:"Password writeback nécessite Azure AD Premium P1 + Azure AD Connect configuré."}
+]
+},
+{
+id:"storage",title:"Stockage Azure",icon:"💾",weight:"15-20%",color:"#FF6B6B",
+lessons:[
+{title:"Storage Accounts — Architecture",content:`**Nommage :** 3-24 caractères, minuscules + chiffres UNIQUEMENT, globalement unique.
+
+**Types :**
+• StorageV2 (GPv2) : Standard, tout supporte — le plus courant
+• Premium BlockBlob : Haute perf block/append blobs
+• Premium FileStorage : Haute perf Azure Files (NFS)
+• Premium PageBlob : Pour VHDs non managés (rare)
+
+**4 services dans un Storage Account :**
+1. **Blob** : fichiers (block blob), logs (append blob), VHDs (page blob)
+2. **Files** : partages SMB 3.x (port 445) et NFS 4.1 (Premium only)
+3. **Tables** : NoSQL clé-valeur
+4. **Queues** : Messages (max 64 KB/message)
+
+**Blob Storage :**
+Container → Blobs. Niveaux d'accès container :
+• Private (défaut) : pas d'accès anonyme
+• Blob : lecture anonyme des blobs
+• Container : lecture anonyme blobs + liste du container
+
+**Types de blobs :**
+• Block Blob : fichiers standard, max 190.7 TB
+• Append Blob : optimisé ajout (logs), max 195 GB
+• Page Blob : accès aléatoire (VHDs), max 8 TB
+
+**Access Tiers :**
+• **Hot** : accès fréquent, stockage cher, accès pas cher
+• **Cool** : 30 jours min, stockage réduit
+• **Cold** : 90 jours min, encore moins cher
+• **Archive** : 180 jours min, réhydratation obligatoire
+  - Standard : jusqu'à 15h | High Priority : < 1h (plus cher)
+• Tier configurable au niveau account (défaut) OU par blob individuel
+
+**Endpoints :**
+• Blob : nomducompte.blob.core.windows.net
+• Files : nomducompte.file.core.windows.net
+• Table : nomducompte.table.core.windows.net
+• Queue : nomducompte.queue.core.windows.net
+• Data Lake : nomducompte.dfs.core.windows.net`},
+
+{title:"Redondance — Tous les détails",content:`**Région primaire :**
+• **LRS** : 3 copies, 1 datacenter. 11 nines. Le moins cher.
+• **ZRS** : 3 copies, 3 Availability Zones. 12 nines. Recommandé HA.
+
+**Avec région secondaire :**
+• **GRS** : LRS primaire + LRS secondaire. 16 nines.
+• **GZRS** : ZRS primaire + LRS secondaire. 16 nines. Le plus résilient.
+• **RA-GRS** : GRS + lecture secondaire (endpoint -secondary)
+• **RA-GZRS** : GZRS + lecture secondaire
+
+**Tableau :**
+LRS : 3 copies, 1 zone, 1 région, pas de lecture 2ndaire
+ZRS : 3 copies, 3 zones, 1 région, pas de lecture 2ndaire
+GRS : 6 copies, 1+1 zones, 2 régions, pas de lecture 2ndaire
+GZRS : 6 copies, 3+1 zones, 2 régions, pas de lecture 2ndaire
+RA-GRS : 6 copies, 1+1 zones, 2 régions, OUI lecture 2ndaire
+RA-GZRS : 6 copies, 3+1 zones, 2 régions, OUI lecture 2ndaire
+
+**Failover :**
+• Initié manuellement (ou automatiquement par Azure en cas de disaster majeur)
+• La secondaire DEVIENT la primaire
+• Après failover : la redondance passe en LRS (il faut reconfigurer)
+• Risque de data loss (réplication asynchrone → RPO > 0)
+
+**Changement de redondance :**
+• LRS ↔ GRS/RA-GRS : possible sans migration
+• LRS → ZRS : nécessite une live migration OU copie manuelle
+• ZRS → GZRS : possible sans migration
+• ⚠️ Archive tier supporte UNIQUEMENT LRS, GRS, RA-GRS`},
+
+{title:"Sécurité du stockage",content:`**1. Access Keys :** 2 clés par compte, accès TOTAL. Rotation recommandée.
+
+**2. SAS (Shared Access Signatures) :**
+• Account SAS : accès multi-services
+• Service SAS : accès un seul service
+• **User Delegation SAS** : Le plus sécurisé ! Signé avec Azure AD (blob uniquement)
+• Paramètres : services, permissions, IP, protocole, dates début/fin
+
+**Stored Access Policy :**
+• Nommée, sur container/queue/table/share
+• Permet de révoquer un SAS sans régénérer la clé
+• Max 5 par ressource
+
+**3. Azure AD Auth (recommandé) :**
+• Storage Blob Data Reader/Contributor/Owner
+• Storage File Data SMB Share Reader/Contributor/Elevated Contributor
+• Storage Queue Data Reader/Contributor/Message Sender/Processor
+• Storage Table Data Reader/Contributor
+
+**4. Encryption :**
+• At rest : TOUJOURS chiffré (SSE, AES-256)
+  - Microsoft-managed keys (par défaut)
+  - Customer-managed keys (Key Vault)
+  - Infrastructure encryption : double chiffrement
+• In transit : HTTPS (min TLS 1.2 recommandé)
+
+**5. Réseau :**
+• Firewall : Allow/Deny par VNet/subnet, IP ranges
+• Service Endpoints : backbone Azure, IP publique
+• Private Endpoints : IP privée dans VNet, DNS privé
+• Par défaut "All networks" → changer en production !
+
+**6. Immutability (WORM) :**
+• Time-based retention : non modifiable pendant X jours
+• Legal hold : protégé jusqu'à retrait du hold
+• Pour la conformité réglementaire
+
+**7. Soft Delete :**
+• Blob soft delete : 1-365 jours de récupération
+• Container soft delete : 1-365 jours
+• File share soft delete : 1-365 jours
+
+**Commandes CLI/PowerShell :**
+# Créer un storage account
+az storage account create --name "mystorageacct" --resource-group "myRG" --location "westeurope" --sku "Standard_LRS" --kind "StorageV2"
+
+# Upload un blob
+az storage blob upload --account-name "mystorageacct" --container-name "mycontainer" --file "./myfile.txt" --name "myfile.txt"
+
+# Générer un SAS
+az storage account generate-sas --account-name "mystorageacct" --permissions rwdlacup --services b --resource-types sco --expiry 2025-12-31
+
+# PowerShell
+New-AzStorageAccount -Name "mystorageacct" -ResourceGroupName "myRG" -Location "westeurope" -SkuName "Standard_LRS"
+Set-AzStorageBlobContent -Container "mycontainer" -File "./myfile.txt" -Blob "myfile.txt"`},
+
+{title:"Lifecycle, Replication & Outils",content:`**Lifecycle Management :**
+Automatise le déplacement/suppression des blobs selon l'âge.
+
+Règles :
+• Filters : blobType (blockBlob, appendBlob), prefix (nom)
+• Actions et délais (jours depuis dernière modification ou accès) :
+  tierToCool → tierToCold → tierToArchive → delete
+• S'applique aux : base blobs, snapshots, versions
+
+Exemple : "Si pas modifié depuis 30j → Cool, 90j → Archive, 365j → Delete"
+
+**Blob Versioning :**
+• Chaque modification crée une nouvelle version
+• Restauration facile d'une version précédente
+• ⚠️ Augmente les coûts de stockage
+
+**Change Feed :**
+• Journal de toutes les modifications des blobs
+• Nécessaire pour Object Replication
+• Format Apache Avro
+
+**Object Replication :**
+• Réplique async entre storage accounts (même ou différentes régions)
+• Nécessite : versioning + change feed sur source, versioning sur destination
+• ⚠️ Ne réplique PAS : snapshots, blobs dans Archive tier, immutable blobs
+
+**Outils de transfert :**
+• **AzCopy** : CLI haute perf. azcopy copy/sync. Auth par SAS ou Azure AD (azcopy login)
+• **Storage Explorer** : GUI desktop, upload/download graphique
+• **Azure Import/Export** : Disques durs physiques envoyés à Microsoft. WAImportExport tool.
+• **Data Box** : Appliance physique. Disk (40TB), Standard (80TB), Heavy (800TB)
+
+**Azure Files détails :**
+• SMB 3.x (port TCP 445 — souvent bloqué par les ISP)
+• NFS 4.1 (Premium uniquement)
+• Tiers : Premium (SSD), Transaction Optimized, Hot, Cool
+• Snapshots : jusqu'à 200, point-in-time, read-only
+• Max 100 TB par share (large file shares activé)
+
+**Azure File Sync :**
+Architecture : Storage Sync Service → Sync Group → Cloud Endpoint + Server Endpoint(s)
+• Cloud Tiering : fichiers peu accédés → stubs (téléchargés à la demande)
+  - Volume free space policy : garder X% libre
+  - Date policy : tier après X jours sans accès
+• 1 Cloud Endpoint par Sync Group (= 1 Azure File share)
+• Plusieurs Server Endpoints par Sync Group
+• Agent sur Windows Server (pas Linux)`},
+
+{title:"Data Lake & Sécurité avancée",content:`**Azure Data Lake Storage Gen2 :**
+• Surcouche sur Blob Storage avec namespace hiérarchique
+• Active "Hierarchical Namespace" à la création du storage account
+• Performances optimisées pour l'analytics (rename/delete de dossiers atomiques)
+• Compatible Hadoop, Spark, Azure Databricks
+• Endpoint : nomducompte.dfs.core.windows.net
+• ACLs POSIX en plus du RBAC
+
+**Azure Storage Encryption Scopes :**
+• Chiffrement différent par container ou blob
+• Utile pour le multi-tenant
+• Microsoft-managed ou Customer-managed keys par scope
+
+**Static Website Hosting :**
+• Héberger un site web statique depuis Blob Storage
+• Endpoint : nomducompte.z6.web.core.windows.net
+• Index document : index.html
+• Error document : 404.html
+• Peut être combiné avec Azure CDN pour un domaine custom et HTTPS
+
+**Points critiques stockage pour l'examen :**
+• Nom du storage account : 3-24 chars, lowercase + digits ONLY
+• Changer LRS → ZRS : live migration ou copie manuelle
+• Archive : réhydratation obligatoire, LRS/GRS/RA-GRS seulement
+• User Delegation SAS : blob only, le plus sécurisé
+• Port 445 pour SMB
+• Private Endpoint > Service Endpoint en sécurité
+• AzCopy pour réseau, Data Box pour gros volumes physiques
+• Object Replication nécessite versioning + change feed
+• Les soft delete et versioning sont des settings SÉPARÉS`}
+],
+quizzes:[
+{q:"Tier Archive supporte quelle redondance ?",options:["Toutes","LRS, GRS, RA-GRS uniquement","ZRS uniquement","Premium uniquement"],correct:1,explanation:"Archive ne supporte que LRS, GRS et RA-GRS. Pas ZRS ni GZRS."},
+{q:"User Delegation SAS fonctionne avec ?",options:["Tous les services","Blob uniquement","Files uniquement","Tables uniquement"],correct:1,explanation:"User Delegation SAS ne fonctionne qu'avec Blob Storage."},
+{q:"Après un failover géo, la redondance devient ?",options:["GRS","ZRS","LRS","RA-GRS"],correct:2,explanation:"Après failover, le compte passe en LRS. Tu dois reconfigurer la redondance."},
+{q:"Port SMB pour Azure Files ?",options:["443","445","3389","22"],correct:1,explanation:"SMB utilise le port TCP 445."},
+{q:"Object Replication nécessite ?",options:["Premium storage","Versioning + Change Feed","Un VPN","Même région uniquement"],correct:1,explanation:"Versioning (source + dest) et Change Feed (source) sont requis."},
+{q:"Stored Access Policy max par container ?",options:["1","3","5","10"],correct:2,explanation:"Maximum 5 stored access policies par container/queue/table/share."},
+{q:"Réhydratation d'un blob Archive en priorité haute prend ?",options:["Immédiat","< 1 heure","Jusqu'à 15 heures","24 heures"],correct:1,explanation:"High Priority : < 1 heure. Standard : jusqu'à 15 heures."},
+{q:"Nom de storage account : quels caractères ?",options:["Lettres, chiffres, tirets","Minuscules et chiffres uniquement","Tout alphanumérique","Lettres et underscores"],correct:1,explanation:"3-24 caractères, minuscules et chiffres UNIQUEMENT."},
+{q:"Static Website Hosting utilise quel service ?",options:["App Service","Blob Storage","Azure CDN","Azure Functions"],correct:1,explanation:"Le static website hosting est une fonctionnalité de Blob Storage."},
+{q:"Data Lake Gen2 nécessite quelle activation ?",options:["Premium tier","Hierarchical Namespace","NFS protocol","ADLS endpoint"],correct:1,explanation:"Il faut activer Hierarchical Namespace à la création du storage account."},
+{q:"La redondance la plus résiliente ?",options:["GRS","GZRS","RA-GZRS","RA-GRS"],correct:2,explanation:"RA-GZRS = ZRS (3 zones) + copie géo + lecture secondaire."},
+{q:"Soft delete pour les containers protège pendant ?",options:["7 jours fixes","1-365 jours configurable","30 jours fixes","Indéfiniment"],correct:1,explanation:"Soft delete pour containers : 1 à 365 jours, configurable."},
+{q:"LRS → ZRS nécessite ?",options:["Juste un changement de setting","Live migration ou copie manuelle","Recréer le storage account","Un ticket support obligatoire"],correct:1,explanation:"Passer de LRS à ZRS nécessite une live migration (demandée à Microsoft) ou copie manuelle des données."},
+{q:"Cloud Tiering dans File Sync remplace les fichiers par ?",options:["Des liens symboliques","Des stubs (pointeurs)","Des fichiers compressés","Des métadonnées JSON"],correct:1,explanation:"Cloud Tiering remplace les fichiers peu accédés par des stubs. Le fichier complet est dans Azure Files."}
+]
+},
+{
+id:"compute",title:"Ressources de Calcul",icon:"⚡",weight:"20-25%",color:"#4ECDC4",
+lessons:[
+{title:"VMs — Config complète",content:`**Composants d'une VM :**
+
+**Taille (Size) :** Standard_D2s_v5 = D(famille) 2(vCPU) s(premium storage) v5(version)
+• Série A : entry-level | B : burstable | D : general purpose
+• E : memory optimized | F : CPU optimized | L : storage optimized
+• M : very high memory | N : GPU | H : HPC
+
+**Disques :**
+• OS Disk : obligatoire, persistant
+• Temporary Disk : ÉPHÉMÈRE ! (D: Windows, /dev/sdb Linux) — pagefile/swap uniquement
+• Data Disks : persistants, nombre max selon la taille VM
+
+**Managed Disks :**
+Ultra Disk > Premium SSD v2 > Premium SSD > Standard SSD > Standard HDD
+• Ultra : 160K IOPS, 4000 MB/s — SAP HANA, top DB
+• Premium SSD : 20K IOPS — production
+• Standard SSD : 6K IOPS — dev/test
+• Standard HDD : 2K IOPS — backup
+
+**Disk Encryption :**
+• SSE (Server-Side) : toujours actif, AES-256 au repos
+• ADE (Azure Disk Encryption) : BitLocker (Win) / DM-Crypt (Linux), clés dans Key Vault
+• Encryption at Host : chiffre temp disk + caches
+• Disk Encryption Sets : customer-managed keys pour managed disks
+
+**VM Extensions :**
+• **Custom Script Extension** : Exécute un script après déploiement (Windows: PowerShell, Linux: bash)
+  Cas d'usage : installer un logiciel, configurer un service
+• **DSC Extension** : Desired State Configuration
+• **Azure Monitor Agent** : Collecte logs et métriques
+• **Dependency Agent** : Mapping des dépendances réseau
+• **Azure Disk Encryption Extension** : Active le chiffrement ADE
+• **BGInfo** : Affiche les infos système sur le bureau (Windows)
+
+**Commandes VM :**
+# PowerShell - Créer une VM
+New-AzVM -ResourceGroupName "myRG" -Name "myVM" -Location "westeurope" -Image "Win2019Datacenter" -Size "Standard_D2s_v5" -Credential $cred
+
+# Azure CLI
+az vm create --resource-group myRG --name myVM --image Win2019Datacenter --size Standard_D2s_v5 --admin-username azureuser --admin-password "P@ss1234!"
+
+# Resize une VM
+az vm resize --resource-group myRG --name myVM --size Standard_D4s_v5
+
+# Démarrer/Arrêter
+az vm start --resource-group myRG --name myVM
+az vm deallocate --resource-group myRG --name myVM  # stop + libère les ressources (pas facturé)
+az vm stop --resource-group myRG --name myVM  # stop mais toujours facturé !
+
+⚠️ az vm stop ≠ az vm deallocate !
+• stop : VM arrêtée mais ressources allouées (tu payes !)
+• deallocate : VM arrêtée ET ressources libérées (tu ne payes plus le compute)`},
+
+{title:"Haute disponibilité & Scale Sets",content:`**Availability Sets :**
+• Fault Domains (FD) : max 3 — racks séparés
+• Update Domains (UD) : max 20 — maintenance Azure
+• SLA 99.95% avec 2+ VMs
+• Créer AVANT les VMs
+• VMs dans le même Availability Set sont dans la MÊME région
+
+**Availability Zones :**
+• Datacenters séparés dans une même région
+• Min 3 zones par région supportée
+• SLA 99.99%
+• Les services sont :
+  - Zonal : déployés dans une zone spécifique (VMs)
+  - Zone-redundant : répartis automatiquement (ZRS, Standard LB)
+
+**VM Scale Sets (VMSS) :**
+• Groupe de VMs identiques + auto-scaling
+• Modes d'orchestration :
+  - Uniform : VMs identiques, gérées comme un ensemble
+  - Flexible : VMs avec configs différentes, plus flexible
+• Scaling rules :
+  - Metric-based : CPU% > 70 → Scale Out
+  - Schedule-based : Lundi 8h → 5 instances
+  - Predictive : ML prédit la charge future
+• Max/Min/Default instance count
+• Cool-down : 5 min par défaut (évite le flapping)
+• Upgrade Policy : Automatic, Rolling, Manual
+
+**SLA Rappel :**
+Single VM (Premium SSD) : 99.9%
+Availability Set : 99.95%
+Availability Zones : 99.99%
+
+**Proximity Placement Groups :**
+• VMs physiquement proches (faible latence)
+• Combinable avec Availability Sets
+• Idéal pour les clusters de DB
+
+**Azure Dedicated Hosts :**
+• Serveur physique dédié à ton organisation
+• Pour la conformité (isolation physique)
+• Tu gères les maintenances`},
+
+{title:"App Service — Détails complets",content:`**Azure App Service** = PaaS pour apps web, API, backends mobile.
+
+**App Service Plan (ASP) :**
+Le conteneur de ressources. Toutes les apps dans le même plan partagent les VMs.
+
+**Tiers :**
+Free (F1) : 1 GB, pas de custom domain SSL, pas de scale
+Shared (D1) : custom domain, pas de SSL, pas de scale
+Basic (B1-B3) : SSL, manual scale, 3 instances max
+Standard (S1-S3) : Auto-scale, 5 slots, 10 instances max
+Premium (P1v3-P3v3) : Auto-scale, 20 slots, 30 instances max, VNet Integration
+Isolated (I1v2-I3v2) : ASE, réseau isolé, 100 instances max
+
+**Deployment Slots :**
+• Environnements séparés avec leur URL
+• Swap : échange trafic SANS downtime
+• Settings "slot-sticky" : restent avec le slot (ex: connection string de staging)
+• Auto Swap : swap automatique après déploiement
+• Traffic routing : envoyer X% du trafic vers un slot (canary deployment)
+
+**Scaling :**
+• Scale Up = vertical (changer de tier)
+• Scale Out = horizontal (ajouter des instances)
+• Auto-scale : CPU%, Memory%, HTTP Queue Length, custom, schedule
+• Cool-down period entre les actions
+
+**Networking App Service :**
+• VNet Integration : l'app accède aux ressources VNet (outbound)
+• Private Endpoints : l'app accessible via IP privée (inbound)
+• Hybrid Connections : accès on-prem sans VPN
+• Access Restrictions : filtre IP, service tags, headers
+
+**Backup & Restore :**
+• Backup : app + DB associée vers Storage Account
+• Standard/Premium tiers
+• Max 10 GB total, schedule automatique ou manuel
+
+**Authentication (Easy Auth) :**
+• Auth intégrée sans modifier le code
+• Providers : Microsoft, Google, Facebook, Twitter, OpenID Connect
+
+**Custom Domain + SSL :**
+• CNAME (subdomain) ou A record + TXT verification
+• Free Managed Certificate (Standard+) ou upload ton cert
+• Enforce HTTPS : configurable
+
+**Commandes :**
+az webapp create --resource-group myRG --plan myPlan --name myApp --runtime "DOTNET|6.0"
+az webapp deployment slot create --resource-group myRG --name myApp --slot staging
+az webapp deployment slot swap --resource-group myRG --name myApp --slot staging`},
+
+{title:"Containers & Azure Kubernetes",content:`**Azure Container Instances (ACI) :**
+• Le plus SIMPLE pour lancer un container
+• Pas de cluster, facturation à la seconde
+• Container Groups : containers qui partagent host, réseau, stockage
+• Volumes : Azure Files, emptyDir, secret, gitRepo
+• Linux et Windows, restart policies : Always, OnFailure, Never
+
+**AKS (Azure Kubernetes Service) :**
+• Control plane : GRATUIT, géré par Azure
+• Worker nodes (agent pools) : TU payes
+• Node Pools :
+  - System : pods système (CoreDNS, metrics-server)
+  - User : tes applications
+• Scaling :
+  - Cluster Autoscaler : nodes
+  - Horizontal Pod Autoscaler : pods
+  - KEDA : scaling événementiel
+• Networking :
+  - kubenet : NAT, simple
+  - Azure CNI : chaque pod a une IP VNet
+• RBAC : intégré Azure AD (cluster roles)
+• Azure Policy pour AKS : forcer les policies sur les pods
+
+**ACR (Azure Container Registry) :**
+• Basic (10 GB), Standard (100 GB), Premium (500 GB, geo-replication, Private Link)
+• ACR Tasks : build automatique (sur commit, sur update d'image base)
+• Commande : az acr build --registry myACR --image myapp:v1 .
+
+**Container Apps :**
+• Serverless containers, basé sur Kubernetes
+• Scale à zéro (pas de coût quand inactif)
+• Revisions : traffic splitting entre versions
+• Dapr integration pour microservices
+
+**ARM Templates & Bicep :**
+• ARM : JSON déclaratif, idempotent
+• Modes : Incremental (défaut) vs Complete (⚠️ supprime les absents)
+• What-if : prévisualise les changements
+• Template Specs : stockage réutilisable
+• Bicep : langage simplifié → compile en ARM JSON
+
+**Azure Migrate :**
+• Outil pour migrer des workloads vers Azure
+• Discovery & Assessment : découvre les serveurs on-prem
+• Server Migration : migre les VMs
+• Dependency analysis : visualise les dépendances
+• Supporte VMware, Hyper-V, physical servers`},
+
+{title:"Backup & Site Recovery",content:`**Azure Backup :**
+
+**Recovery Services Vault :**
+• Stocke les backups de : VMs Azure, SQL in VM, Azure Files, on-prem (MARS agent)
+• Même région que les ressources (ou GRS pour cross-region restore)
+
+**Backup Vault :**
+• Plus récent : Azure Disks, Blobs, PostgreSQL, AKS
+
+**Backup Policies :**
+• Fréquence : Hourly (toutes les 4/6/8/12h), Daily, Weekly
+• Rétention : quotidien (max 9999 jours), hebdomadaire, mensuel, annuel
+• Instant Restore : snapshots locaux pour restore rapide
+
+**Types de backup VM :**
+• Crash-consistent : snapshot du disque (la VM peut ne pas être propre)
+• File-system consistent : flush des écritures avant snapshot
+• Application-consistent : quiesce les applications (VSS sur Windows)
+• Par défaut : application-consistent si l'agent est installé
+
+**Restore :**
+• Full VM restore (nouveau ou remplacer l'existante)
+• Restore disks uniquement
+• File recovery : monter les disques sur une VM et copier les fichiers
+• Cross-region restore : si GRS activé, restore dans la région secondaire
+
+**MARS Agent :**
+• Microsoft Azure Recovery Services agent
+• Pour backuper des fichiers/dossiers from on-prem ou Azure VMs
+• Pas besoin de System Center DPM
+
+**Azure Site Recovery (ASR) :**
+• Disaster Recovery as a Service
+• Réplique VMs Azure → autre région | VMware/Hyper-V → Azure
+• RPO : généralement quelques minutes
+• RTO : minutes à heures
+• **Test failover** : teste sans impact sur la production !
+• **Failover** : bascule vers la région secondaire
+• **Failback** : retour à la région primaire
+• Recovery Plans : orchestrent le failover de plusieurs VMs (ordre, scripts, etc.)
+
+**Commandes :**
+# Créer un Recovery Services Vault
+az backup vault create --resource-group myRG --name myVault --location westeurope
+
+# Activer le backup d'une VM
+az backup protection enable-for-vm --resource-group myRG --vault-name myVault --vm myVM --policy-name DefaultPolicy
+
+# Lancer un backup
+az backup protection backup-now --resource-group myRG --vault-name myVault --container-name myVM --item-name myVM`}
+],
+quizzes:[
+{q:"az vm stop vs az vm deallocate ?",options:["Identiques","stop = arrêté mais facturé, deallocate = libéré pas facturé","stop = pas facturé, deallocate = facturé","Aucun des deux n'arrête la VM"],correct:1,explanation:"stop : VM arrêtée mais compute toujours alloué (facturé !). deallocate : compute libéré (pas facturé)."},
+{q:"Custom Script Extension sert à ?",options:["Chiffrer les disques","Exécuter un script post-déploiement","Monitorer la VM","Configurer le réseau"],correct:1,explanation:"Custom Script Extension exécute un script (PS/bash) après le déploiement de la VM."},
+{q:"SLA single VM avec Premium SSD ?",options:["99%","99.5%","99.9%","99.95%"],correct:2,explanation:"Single VM avec Premium SSD = 99.9%. Availability Set = 99.95%. Zones = 99.99%."},
+{q:"ARM Template mode Complete ?",options:["Ajoute uniquement","Ajoute ET supprime les absents","Ne fait rien si existe","Refuse si conflit"],correct:1,explanation:"Complete mode SUPPRIME les ressources absentes du template. Dangereux !"},
+{q:"AKS control plane est ?",options:["Payant","Gratuit géré par Azure","Sur tes VMs","Optionnel"],correct:1,explanation:"Le control plane AKS est gratuit et géré par Azure. Tu payes les worker nodes."},
+{q:"Max Fault Domains dans un Availability Set ?",options:["2","3","5","20"],correct:1,explanation:"Max 3 Fault Domains. Update Domains : max 20."},
+{q:"Deployment Slots disponibles à partir de ?",options:["Free","Basic","Standard","Premium only"],correct:2,explanation:"Deployment Slots à partir de Standard (5 slots). Premium : 20 slots."},
+{q:"Azure Migrate sert à ?",options:["Backuper des VMs","Migrer des workloads vers Azure","Monitorer les performances","Configurer le réseau"],correct:1,explanation:"Azure Migrate découvre, évalue et migre les serveurs on-prem vers Azure."},
+{q:"VMSS Upgrade Policy 'Rolling' ?",options:["Mise à jour de toutes les VMs en même temps","Mise à jour par lots avec pause","Mise à jour manuelle uniquement","Pas de mise à jour"],correct:1,explanation:"Rolling met à jour par lots en respectant un max unavailable. Automatic met tout à jour dès que possible."},
+{q:"Test failover dans ASR ?",options:["Impacte la production","Teste sans impacter la production","Supprime la réplication","N'est pas possible"],correct:1,explanation:"Test failover crée des VMs de test dans un réseau isolé. Aucun impact sur la production."},
+{q:"Backup application-consistent nécessite ?",options:["Rien de spécial","L'agent de backup installé","Premium storage","Key Vault"],correct:1,explanation:"Pour un backup application-consistent, le VM agent doit être installé (VSS pour Windows)."},
+{q:"Azure Dedicated Host est pour ?",options:["Plus de performance","Isolation physique/conformité","Networking dédié","Stockage premium"],correct:1,explanation:"Dedicated Host = serveur physique dédié à ton organisation, pour les besoins de conformité."},
+{q:"Container Apps peut scaler à ?",options:["Minimum 1 instance","Zéro instance","Minimum 2 instances","Minimum 3 instances"],correct:1,explanation:"Container Apps peut scaler à zéro (pas de coût quand inactif)."},
+{q:"Temporary Disk d'une VM est perdu quand ?",options:["Jamais","Au stop/deallocate ou maintenance","Seulement au reboot","Après 24h"],correct:1,explanation:"Les données du Temporary Disk sont perdues lors du deallocate, resize, ou maintenance host."},
+{q:"Bicep compile vers ?",options:["YAML","JSON (ARM Template)","PowerShell","Terraform"],correct:1,explanation:"Bicep est un DSL qui se compile en ARM JSON."}
+]
+},
+{
+id:"net",title:"Réseau Virtuel",icon:"🌐",weight:"15-20%",color:"#9B59B6",
+lessons:[
+{title:"VNets, Subnets & IP",content:`**VNet :** Réseau privé Azure. 1 VNet = 1 région, 1 subscription.
+Espace d'adressage : plages CIDR (ex: 10.0.0.0/16)
+Subnets : subdivisions (ex: 10.0.1.0/24)
+
+**5 adresses réservées par subnet :**
+.0 (réseau), .1 (gateway), .2-.3 (DNS Azure), dernière (broadcast)
+→ /24 (256) = 251 utilisables | /27 (32) = 27 utilisables | /28 (16) = 11 utilisables
+
+**Subnets spéciaux :**
+• GatewaySubnet : VPN/ExpressRoute (/27 recommandé)
+• AzureFirewallSubnet : Azure Firewall (/26 minimum)
+• AzureBastionSubnet : Bastion (/26 minimum)
+• RouteServerSubnet : Route Server
+
+**IP Publique :**
+• SKU Basic : dynamique ou statique, pas de zone (deprecated bientôt)
+• SKU Standard : statique UNIQUEMENT, zone-redundant, deny all par défaut
+• IPv4 et IPv6 supportés (dual-stack)
+
+**IP Privée :** DHCP Azure ou statique dans le subnet
+
+**DNS Settings :**
+• Par défaut : Azure-provided DNS (168.63.129.16)
+• Custom DNS : configure tes propres serveurs DNS dans les settings VNet
+
+**Communication :**
+• Même VNet : automatique (même entre subnets différents)
+• VNets différents : peering, VPN, ou Virtual WAN
+• Vers Internet : NAT sortant par défaut
+• Vers on-prem : VPN Gateway, ExpressRoute`},
+
+{title:"VNet Peering, VPN & ExpressRoute",content:`**VNet Peering :**
+• Regional (même région) ou Global (régions différentes)
+• Trafic sur backbone Microsoft (pas Internet)
+• ⚠️ NON TRANSITIF : A↔B et B↔C ≠ A↔C
+• Configuration BILATÉRALE (les deux côtés doivent l'accepter)
+• Pas de chevauchement d'adresses
+
+**Options de peering :**
+• Allow forwarded traffic : accepter trafic forwardé (pas originé du pair)
+• Allow gateway transit : partager la gateway avec le pair
+• Use remote gateways : utiliser la gateway du pair
+
+**Hub-Spoke :**
+Hub central (VPN GW + Firewall + shared services) peeré avec des Spokes.
+Gateway Transit : les Spokes utilisent la VPN GW du Hub.
+
+**VPN Gateway :**
+• Déployé dans GatewaySubnet
+• **Site-to-Site (S2S)** : réseau-à-réseau permanent, IPsec/IKE, VPN device on-prem
+• **Point-to-Site (P2S)** : un ordinateur → VNet, OpenVPN/SSTP/IKEv2
+• **VNet-to-VNet** : comme peering mais via VPN
+
+SKUs : Basic → VpnGw1-5 (+ Az pour zone-redundant)
+Active-Active : deux tunnels, HA (pas supporté Basic)
+BGP : routage dynamique supporté
+
+**ExpressRoute :**
+• Connexion privée dédiée (pas Internet)
+• 50 Mbps à 100 Gbps
+• Peering : Azure Private (VNets), Microsoft (M365, Azure public services)
+• Standard (même géo) ou Premium (global)
+• Global Reach : connecter 2 sites on-prem via ExpressRoute backbone
+• ExpressRoute Direct : connexion directe aux routeurs edge Microsoft (40/100 Gbps)
+
+**Virtual WAN :**
+• Service réseau Microsoft qui relie : S2S, P2S, ExpressRoute, VNet
+• Hub-and-spoke automatisé et managé
+• Transitivité intégrée entre VNets connectés au hub`},
+
+{title:"NSG, ASG & Azure Firewall",content:`**NSG :**
+Firewall stateful L3/L4. Règles Inbound et Outbound.
+• Priorité 100-4096 (bas = plus prioritaire)
+• Source/Dest : IP, CIDR, Service Tag, ASG
+• Action : Allow ou Deny
+
+**Règles par défaut (non supprimables) :**
+Inbound : 65000 AllowVnetIn, 65001 AllowAzureLBIn, 65500 DenyAllIn
+Outbound : 65000 AllowVnetOut, 65001 AllowInternetOut, 65500 DenyAllOut
+
+**Attachement :** Subnet ET/OU NIC (les deux évalués)
+Si NSG sur subnet + NSG sur NIC : le trafic doit être Allow par les DEUX.
+
+**Service Tags :** Internet, VirtualNetwork, AzureLoadBalancer, Storage, Sql, AzureMonitor...
+Mis à jour automatiquement par Microsoft.
+
+**ASG (Application Security Groups) :**
+• Regroupent les NICs par rôle logique
+• NSG rule : Allow ASG "WebServers" → ASG "DBServers" port 1433
+• Les NICs d'un ASG doivent être dans le MÊME VNet
+
+**Azure Firewall :**
+• Managé, stateful, L3-L7
+• Standard : FQDN filtering, threat intelligence, NAT/Network/App rules
+• Premium : + TLS inspection, IDPS, URL filtering, web categories
+• Basic : fonctionnalités réduites, petit déploiement
+
+**Firewall Policy :**
+• Hiérarchie : Parent → Child policies (héritage)
+• Rule Collection Groups → Rule Collections → Rules
+• Priorité types : DNAT > Network > Application
+• Threat Intelligence modes : Off, Alert, Alert and Deny
+
+**Commandes NSG :**
+# Créer un NSG
+az network nsg create --resource-group myRG --name myNSG
+
+# Ajouter une règle
+az network nsg rule create --resource-group myRG --nsg-name myNSG --name AllowHTTP --priority 100 --access Allow --protocol Tcp --destination-port-ranges 80 --direction Inbound
+
+# Associer à un subnet
+az network vnet subnet update --resource-group myRG --vnet-name myVNet --name mySubnet --network-security-group myNSG`},
+
+{title:"DNS, Load Balancers & App Gateway",content:`**Azure DNS :**
+• Zones publiques : résolution Internet
+  - Alias records : pointent vers ressource Azure (auto-update si IP change)
+  - Records : A, AAAA, CNAME, MX, NS, PTR, SOA, SRV, TXT, CAA
+  - Délégation : pointer NS records de ton registrar vers Azure DNS
+• Zones privées : résolution interne VNet
+  - Virtual Network Link (lier le VNet)
+  - Auto-registration : VMs auto-enregistrées dans la zone
+
+**Azure Load Balancer :**
+• L4 (TCP/UDP)
+• Basic (gratuit, deprecated) vs Standard (SLA 99.99%, zone-redundant, sécurisé)
+• Public (Internet) vs Internal (VNet)
+• Composants :
+  - Frontend IP : IP d'entrée
+  - Backend pool : VMs/instances
+  - Health probes : HTTP/HTTPS/TCP
+  - LB rules : lient frontend ↔ backend ↔ probe
+  - Inbound NAT rules : port forward (50001→VM1:3389)
+  - Outbound rules : SNAT pour trafic sortant
+• Session persistence : None (5-tuple), Source IP (2-tuple), Source IP + Protocol (3-tuple)
+
+**Application Gateway :**
+• L7 (HTTP/HTTPS)
+• URL-based routing (/images → pool1, /api → pool2)
+• Multi-site hosting (site1.com → pool1)
+• SSL termination / End-to-end SSL
+• **WAF** (Web Application Firewall) : OWASP protection
+• Autoscaling, cookie-based affinity
+• SKUs : Standard_v2, WAF_v2
+
+**Traffic Manager :**
+• DNS-based load balancer (ne voit pas le trafic, juste résolution DNS)
+• Routing methods :
+  - Priority : failover (primaire/secondaire)
+  - Weighted : % du trafic par endpoint
+  - Performance : endpoint le plus proche (latence)
+  - Geographic : par localisation du client
+  - Subnet : par plage IP du client
+  - MultiValue : retourne plusieurs IP
+
+**Azure Front Door :**
+• CDN + L7 global load balancer
+• Routing : latency, priority, weighted, session affinity
+• WAF intégré, SSL, caching
+• Split TCP : optimise les connexions TCP via les POP edge
+
+**Azure Bastion :**
+• RDP/SSH via HTTPS (port 443) depuis le portail Azure
+• Pas d'IP publique nécessaire sur la VM
+• Déployé dans AzureBastionSubnet (/26 minimum)
+• Standard tier : native client support, shareable link`},
+
+{title:"Routing, Private Endpoints & Diagnostics",content:`**System Routes :** Azure route automatiquement entre subnets d'un même VNet.
+
+**UDR (User-Defined Routes) :**
+• Route Table → associée à un subnet
+• Next hop : Virtual Network, Virtual Appliance (ex: Firewall IP), Virtual Network Gateway, Internet, None (drop)
+• Forced Tunneling : 0.0.0.0/0 → VPN Gateway (tout Internet passe par on-prem)
+• Route vers Firewall : 0.0.0.0/0 → Virtual Appliance (IP Firewall)
+
+**Service Endpoints :**
+• Backbone Azure, IP publique du service
+• Gratuit, configuré par subnet + service
+• Services : Storage, SQL, Key Vault, Event Hubs, Service Bus, Cosmos DB, App Service
+
+**Private Endpoints :**
+• NIC avec IP privée dans ton VNet
+• DNS privé : Private DNS Zone (ex: privatelink.blob.core.windows.net)
+• Accès depuis on-prem via VPN/ER
+• Plus sécurisé, mais payant
+
+**Comparaison :**
+Service EP : IP publique, backbone Azure, gratuit, pas d'accès on-prem
+Private EP : IP privée, totalement privé, payant, accès on-prem via VPN/ER
+
+**NAT Gateway :**
+• SNAT pour le trafic sortant d'un subnet
+• IP(s) publique(s) dédiée(s) pour le sortant
+• Évite l'épuisement des ports SNAT du Load Balancer
+
+**Network Watcher :**
+• IP Flow Verify : paquet autorisé/bloqué par NSG ?
+• Next Hop : quelle route le paquet prend ?
+• Effective Security Rules : toutes les NSG rules consolidées
+• Connection Troubleshoot : teste connectivité A → B
+• NSG Flow Logs : journalise le trafic des NSG
+• Packet Capture : capture réseau sur une VM
+• Connection Monitor : monitoring continu
+• Traffic Analytics : analyse intelligente des flow logs
+
+**Commandes :**
+# Créer un VNet
+az network vnet create --resource-group myRG --name myVNet --address-prefix 10.0.0.0/16 --subnet-name default --subnet-prefix 10.0.0.0/24
+
+# Créer un peering
+az network vnet peering create --resource-group myRG --name vnet1-to-vnet2 --vnet-name vnet1 --remote-vnet vnet2 --allow-vnet-access
+
+# Créer une route table
+az network route-table create --resource-group myRG --name myRouteTable
+az network route-table route create --resource-group myRG --route-table-name myRouteTable --name toFirewall --address-prefix 0.0.0.0/0 --next-hop-type VirtualAppliance --next-hop-ip-address 10.0.1.4`}
+],
+quizzes:[
+{q:"VNet Peering est transitif ?",options:["Oui toujours","Non jamais","Avec Gateway Transit","Seulement Global"],correct:1,explanation:"Le peering n'est PAS transitif. A↔B et B↔C n'implique pas A↔C."},
+{q:"Adresses utilisables dans un /28 subnet ?",options:["16","14","11","8"],correct:2,explanation:"/28 = 16 adresses - 5 réservées = 11 utilisables."},
+{q:"NSG priorité : 100 vs 200 ?",options:["200 est plus prioritaire","100 est plus prioritaire","Même priorité","Dépend de la direction"],correct:1,explanation:"Plus le numéro est BAS, plus la règle est prioritaire."},
+{q:"Azure Firewall Premium ajoute quoi ?",options:["FQDN filtering","TLS inspection et IDPS","NAT rules","Threat intelligence"],correct:1,explanation:"Premium ajoute TLS inspection, IDPS, URL filtering, web categories."},
+{q:"Traffic Manager routing 'Performance' ?",options:["Par priorité","Par poids","Par latence la plus basse","Par géographie"],correct:2,explanation:"Performance route vers l'endpoint avec la latence la plus basse pour le client."},
+{q:"Private Endpoint crée quoi dans le VNet ?",options:["Un subnet","Une NIC avec IP privée","Un VPN tunnel","Un DNS server"],correct:1,explanation:"Private Endpoint crée une interface réseau avec une IP privée dans ton VNet."},
+{q:"NAT Gateway sert à ?",options:["Filtrer le trafic entrant","Fournir des IPs publiques dédiées pour le sortant","Load balancer le trafic","Créer des tunnels VPN"],correct:1,explanation:"NAT Gateway fournit des IPs publiques statiques pour le trafic sortant (SNAT)."},
+{q:"GatewaySubnet taille recommandée ?",options:["/30","/28","/27","/24"],correct:2,explanation:"/27 est recommandé pour GatewaySubnet. /28 est le minimum pour VPN Gateway."},
+{q:"ExpressRoute Global Reach ?",options:["Connecte VNets entre régions","Connecte 2 sites on-prem via ExpressRoute","Étend ExpressRoute à Internet","Active le peering global"],correct:1,explanation:"Global Reach permet de connecter deux sites on-prem entre eux via le backbone ExpressRoute."},
+{q:"WAF est intégré dans ?",options:["Azure Firewall","Application Gateway et Front Door","Load Balancer","NSG"],correct:1,explanation:"WAF est disponible sur Application Gateway (WAF_v2) et Azure Front Door."},
+{q:"NSG sur subnet + NSG sur NIC : le trafic doit être ?",options:["Allow par l'un des deux","Allow par les DEUX","Allow par le subnet uniquement","Allow par la NIC uniquement"],correct:1,explanation:"Le trafic doit être Allow par les DEUX NSG (subnet ET NIC)."},
+{q:"IP Publique SKU Standard est ?",options:["Dynamique par défaut","Statique uniquement","Zone-redundant","B et C sont corrects"],correct:3,explanation:"Standard = statique uniquement + zone-redundant + deny all par défaut."},
+{q:"Azure Bastion nécessite ?",options:["IP publique sur la VM","Un VPN Gateway","Un subnet nommé AzureBastionSubnet","Un agent sur la VM"],correct:2,explanation:"Bastion nécessite un subnet nommé AzureBastionSubnet (/26 min). Pas d'IP publique ni agent sur la VM."},
+{q:"Virtual WAN fournit la transitivité ?",options:["Non","Oui, entre les VNets connectés au hub","Seulement avec Premium","Seulement S2S"],correct:1,explanation:"Virtual WAN offre la transitivité automatique entre les VNets connectés au hub."}
+]
+},
+{
+id:"monitor",title:"Monitoring & Maintenance",icon:"📊",weight:"10-15%",color:"#F39C12",
+lessons:[
+{title:"Azure Monitor — Architecture",content:`**Azure Monitor** collecte, analyse et agit sur les données de télémétrie.
+
+**2 types de données :**
+• **Metrics** : Numériques, temps réel, 93 jours, Metrics Explorer
+• **Logs** : Texte structuré, KQL, Log Analytics Workspace, rétention 30-730 jours
+
+**Sources :**
+• Application (Application Insights)
+• Guest OS (Azure Monitor Agent)
+• Ressources Azure (Diagnostic Settings)
+• Subscription (Activity Log)
+• Tenant (Azure AD logs)
+
+**Log Analytics Workspace :**
+• "Base de données" centrale pour les logs
+• Tables : AzureActivity, Heartbeat, Perf, Event, Syslog, AzureDiagnostics, SecurityEvent
+• Modes de tarification : Pay-As-You-Go, Commitment Tiers (100-5000 GB/jour)
+• Data Collection Rules (DCR) : quoi collecter, de où, vers où
+
+**Azure Monitor Agent (AMA) :**
+• Remplace MMA, Log Analytics Agent, Telegraf
+• Installé sur VMs Windows et Linux
+• Configuré via DCR
+• Supporte plusieurs destinations (multi-homing)
+
+**Diagnostic Settings :**
+• Par ressource Azure
+• Destinations : Log Analytics, Storage Account, Event Hub, Partner
+• Catégories de logs spécifiques par type de ressource
+
+**Activity Log :**
+• Événements au niveau subscription
+• Catégories : Administrative, Service Health, Resource Health, Alert, Autoscale, Policy, Security, Recommendation
+• Rétention : 90 jours (extensible via Diagnostic Settings → Log Analytics)
+• Exemple : "VM myVM was deleted by user thomas@contoso.com"
+
+**Application Insights :**
+• APM pour les apps web
+• Availability Tests : ping depuis plusieurs régions
+• Application Map : dépendances
+• Live Metrics : temps réel
+• Smart Detection : anomalies auto
+• Supporte : .NET, Java, Node.js, Python`},
+
+{title:"KQL — Requêtes d'examen",content:`**Syntaxe de base :**
+Table | where Condition | project Columns | summarize Aggregation | sort by Column
+
+**Opérateurs essentiels :**
+• where : filtre (==, !=, >, <, contains, startswith, in, !in, between)
+• project : sélectionne les colonnes
+• extend : ajoute une colonne calculée
+• summarize : agrège (count, avg, sum, min, max, percentile, dcount)
+• sort by / order by : trie
+• take / limit : limite les résultats
+• join : joint 2 tables (on colonne commune)
+• union : combine 2 tables
+• render : visualise (timechart, barchart, piechart)
+• let : variable temporaire
+
+**Fonctions temporelles :**
+ago(1h), ago(7d), ago(30d)
+bin(TimeGenerated, 5m) : grouper par intervalles
+between(datetime(2024-01-01)..datetime(2024-12-31))
+format_datetime(TimeGenerated, 'yyyy-MM-dd')
+
+**Requêtes d'examen courantes :**
+
+// VMs qui ne répondent plus
+Heartbeat | summarize LastBeat=max(TimeGenerated) by Computer | where LastBeat < ago(5m)
+
+// Top 10 CPU
+Perf | where ObjectName=="Processor" and CounterName=="% Processor Time"
+| summarize AvgCPU=avg(CounterValue) by Computer | top 10 by AvgCPU desc
+
+// Erreurs Activity Log 24h
+AzureActivity | where Level=="Error" and TimeGenerated > ago(24h)
+| summarize count() by OperationNameValue | sort by count_ desc
+
+// Espace disque < 10%
+Perf | where ObjectName=="LogicalDisk" and CounterName=="% Free Space"
+| where CounterValue < 10 | project Computer, InstanceName, CounterValue
+
+// Connexions échouées
+SigninLogs | where ResultType != 0 | summarize FailCount=count() by UserPrincipalName
+| where FailCount > 10 | sort by FailCount desc
+
+// VMs créées cette semaine
+AzureActivity | where OperationNameValue == "MICROSOFT.COMPUTE/VIRTUALMACHINES/WRITE"
+| where ActivityStatusValue == "Success" | where TimeGenerated > ago(7d)
+| project TimeGenerated, Caller, ResourceGroup
+
+**Pour l'examen :** Tu dois savoir LIRE et COMPRENDRE les requêtes KQL. On ne te demandera pas de les écrire de mémoire, mais de choisir la bonne requête parmi des options.`},
+
+{title:"Alertes & Autoscale",content:`**Types d'alertes :**
+• **Metric alerts** : CPU > 90%, Dynamic threshold (ML baseline)
+• **Log alerts** : Basées sur KQL, fréquence configurable
+• **Activity Log alerts** : Événements ARM (VM supprimée, role modifié)
+• **Service Health alerts** : Incidents Azure, maintenance planifiée
+• **Resource Health alerts** : État d'une ressource spécifique
+
+**Composants :**
+1. Alert Rule : condition + scope + fréquence
+2. Action Group : actions à déclencher
+3. Alert Processing Rules : suppression/routage des alertes
+
+**Severity :** Sev 0 (Critical) → Sev 4 (Verbose)
+
+**Action Groups — Actions possibles :**
+• Email / SMS / Push / Voice
+• Azure Function / Logic App / Webhook / Secure Webhook
+• Automation Runbook
+• ITSM Connector (ServiceNow)
+• Event Hub
+
+**Alert Processing Rules :**
+• Supprimer les alertes pendant une maintenance
+• Appliquer un Action Group à un scope entier
+• Filtres : severity, resource type, etc.
+
+**Metric Alert — Static vs Dynamic :**
+• Static : valeur fixe (CPU > 90)
+• Dynamic : ML calcule la baseline, sensibilité High/Medium/Low
+  High = beaucoup d'alertes, Low = peu d'alertes
+
+**Autoscale :**
+• S'applique à : VMSS, App Service, Cloud Services
+• Rules :
+  - Metric-based : CPU > 70% pendant 10 min → +1 instance
+  - Schedule-based : Tous les lundis 8h → 5 instances
+• Paramètres :
+  - Minimum instances : plancher
+  - Maximum instances : plafond
+  - Default : si les métriques ne sont pas dispo
+• Cool-down : temps d'attente entre 2 actions (défaut 5 min)
+• ⚠️ Scale-in et Scale-out avec seuils DIFFÉRENTS pour éviter le flapping
+  Exemple : Out à CPU > 70%, In à CPU < 40% (PAS 70% !)
+
+**Commandes :**
+# Créer un action group
+az monitor action-group create --resource-group myRG --name myAG --short-name myag --action email admin admin@contoso.com
+
+# Créer une alerte métrique
+az monitor metrics alert create --resource-group myRG --name highCPU --scopes /subscriptions/.../myVM --condition "avg Percentage CPU > 90" --action myAG`},
+
+{title:"Advisor, Service Health & Insights",content:`**Azure Advisor — 5 catégories :**
+1. **Reliability** : HA (Availability Sets, backups, soft delete)
+2. **Security** : MFA, vulnérabilités, chiffrement (intégré Defender for Cloud)
+3. **Performance** : rightsizing VMs, caching, upgrade SKU
+4. **Cost** : VMs sous-utilisées, réservations, ressources orphelines, Savings Plans
+5. **Operational Excellence** : health alerts, tags, bonnes pratiques
+
+**Azure Service Health — 3 niveaux :**
+• **Azure Status** : Page publique, état global
+• **Service Health** : Problèmes affectant TES services dans TES régions
+  - Service Issues : pannes en cours
+  - Planned Maintenance : maintenances planifiées
+  - Health Advisories : changements à venir
+  - Security Advisories
+  Crée des alertes Service Health !
+• **Resource Health** : État d'UNE ressource
+  Available | Unavailable | Degraded | Unknown
+
+**VM Insights :**
+• Performance : CPU, mémoire, disque, réseau dans le temps
+• Map : dépendances réseau (qui se connecte à quoi)
+• Nécessite AMA + Dependency Agent
+
+**Container Insights :**
+• Performance des nodes et containers AKS
+• Logs des containers, alertes
+
+**Network Insights :**
+• Topology réseau
+• Santé des connexions
+• Traffic Analytics
+
+**Workbooks :**
+• Rapports interactifs et personnalisables
+• Combinent texte, KQL, métriques, paramètres
+• Templates prédéfinis (VM Performance, Network, etc.)
+• Partageables dans l'organisation
+
+**Azure Automation — Rappel :**
+• Runbooks : PowerShell/Python automatisés
+• Update Management : patch VMs Windows/Linux
+• State Configuration (DSC) : maintenir l'état souhaité
+• Schedules, Webhooks, Variables, Credentials
+
+**Pour l'examen — Monitoring checklist :**
+✓ Savoir créer alertes + action groups
+✓ Lire des requêtes KQL
+✓ Connaître les 5 catégories Advisor
+✓ 3 niveaux Service Health
+✓ Configurer autoscale (seuils différents in/out)
+✓ Diagnostic Settings : destinations
+✓ AMA vs anciens agents
+✓ Activity Log rétention 90 jours par défaut`}
+],
+quizzes:[
+{q:"KQL : 'summarize count() by Computer' fait ?",options:["Compte total de lignes","Compte par ordinateur","Liste les ordinateurs","Supprime les doublons"],correct:1,explanation:"summarize count() by Computer compte les lignes pour chaque Computer."},
+{q:"Activity Log rétention par défaut ?",options:["30 jours","60 jours","90 jours","365 jours"],correct:2,explanation:"Activity Log : 90 jours. Extensible en envoyant vers Log Analytics."},
+{q:"Dynamic threshold utilise ?",options:["Une valeur fixe","Du Machine Learning","KQL","Des percentiles manuels"],correct:1,explanation:"Dynamic threshold utilise le ML pour calculer automatiquement la baseline."},
+{q:"Autoscale cool-down par défaut ?",options:["1 minute","5 minutes","10 minutes","15 minutes"],correct:1,explanation:"Le cool-down par défaut est de 5 minutes."},
+{q:"Azure Advisor catégorie pour les VMs sous-utilisées ?",options:["Reliability","Performance","Cost","Operational Excellence"],correct:2,explanation:"Les recommandations de VMs sous-utilisées sont dans la catégorie Cost."},
+{q:"Workbooks Azure Monitor servent à ?",options:["Créer des alertes","Générer des rapports interactifs","Configurer le scaling","Gérer les agents"],correct:1,explanation:"Workbooks créent des rapports interactifs combinant texte, KQL, métriques et paramètres."},
+{q:"Service Health 'Planned Maintenance' ?",options:["Pannes en cours","Maintenances prévues par Azure","Recommandations de sécurité","Mises à jour de code"],correct:1,explanation:"Planned Maintenance = maintenances planifiées par Azure qui pourraient affecter tes services."},
+{q:"Pour éviter le flapping autoscale ?",options:["Augmenter le max instances","Mettre des seuils différents in/out","Désactiver le scale-in","Augmenter la fréquence"],correct:1,explanation:"Seuils différents : ex. Scale Out à CPU>70%, Scale In à CPU<40% (pas 70%)."},
+{q:"AMA remplace quels agents ?",options:["MARS Agent","MMA et Log Analytics Agent","Dependency Agent","Backup Agent"],correct:1,explanation:"Azure Monitor Agent (AMA) remplace MMA, Log Analytics Agent et Telegraf."},
+{q:"Resource Health 'Unknown' signifie ?",options:["Ressource inexistante","Pas de données depuis >10 min","Ressource en cours de création","Licence expirée"],correct:1,explanation:"Unknown = Azure n'a pas reçu de signal de la ressource depuis plus de 10 minutes."},
+{q:"Diagnostic Settings peut envoyer vers ?",options:["Log Analytics uniquement","Log Analytics, Storage, Event Hub, Partner","Seulement Storage Account","Seulement Event Hub"],correct:1,explanation:"4 destinations possibles pour les Diagnostic Settings."},
+{q:"KQL 'ago(7d)' signifie ?",options:["Dans 7 jours","Il y a 7 jours","Les 7 premiers jours","7 jours de données"],correct:1,explanation:"ago(7d) = il y a 7 jours. Utilisé avec where TimeGenerated > ago(7d) pour filtrer."}
+]
+}
+];
+
+// ═══════════ FLASHCARDS ═══════════
+const FC=[
+{f:"Azure AD Connect",b:"Synce AD on-prem → Azure AD. Méthodes : PHS (hash cloud, simple), PTA (auth on-prem), Federation (AD FS)."},
+{f:"PHS vs PTA",b:"PHS : hash dans le cloud, fonctionne si on-prem down, requis pour Identity Protection. PTA : mdp reste on-prem, agent nécessaire."},
+{f:"Conditional Access",b:"IF (user/app/condition) THEN (grant/block + controls). Nécessite Azure AD P1. Mutuellement exclusif avec Security Defaults."},
+{f:"MFA Méthodes",b:"Authenticator, SMS, Voice, OATH tokens, FIDO2, Windows Hello. Recommandé : Authenticator + Conditional Access."},
+{f:"Owner vs Contributor vs Reader",b:"Owner : tout + RBAC. Contributor : tout sauf RBAC. Reader : lecture seule. User Access Admin : RBAC uniquement."},
+{f:"RBAC Azure vs Rôles Azure AD",b:"RBAC = ressources Azure (scope MG→Sub→RG→Resource). Rôles AD = tenant (Global Admin, User Admin...)."},
+{f:"Managed Identity",b:"System-assigned : 1:1 avec ressource, supprimée avec elle. User-assigned : indépendante, partageable."},
+{f:"Azure Policy — 7 effets",b:"Deny, Audit, Append, Modify, DeployIfNotExists, AuditIfNotExists, Disabled. Ordre : Disabled→Append/Modify→Deny→Audit."},
+{f:"Resource Locks",b:"ReadOnly : personne ne modifie (même Owner). CanNotDelete : personne ne supprime. Hérités par les enfants."},
+{f:"Tags",b:"Paires clé:valeur. PAS hérités ! Max 50/ressource. Azure Policy peut forcer l'héritage (Modify)."},
+{f:"Key Vault",b:"Secrets + Keys + Certificates. RBAC recommandé. Soft Delete + Purge Protection. Standard vs Premium (HSM)."},
+{f:"Blob Tiers",b:"Hot (fréquent) → Cool (30j) → Cold (90j) → Archive (180j, réhydratation). Configurable par account ou par blob."},
+{f:"Storage Redondance",b:"LRS(3/1DC) ZRS(3/3zones) GRS(LRS+géo) GZRS(ZRS+géo) RA-GRS/RA-GZRS(+lecture 2ndaire)."},
+{f:"SAS — 3 types",b:"Account SAS (multi-service), Service SAS (1 service), User Delegation SAS (Azure AD, blob only, le + sûr)."},
+{f:"AzCopy vs Data Box",b:"AzCopy : CLI réseau haute perf. Data Box : appliance physique pour gros volumes (80TB/800TB)."},
+{f:"Azure File Sync",b:"Sync Windows Server ↔ Azure Files. Cloud Tiering : stubs pour fichiers peu accédés. Port SMB = 445."},
+{f:"VM stop vs deallocate",b:"stop : arrêtée MAIS facturée. deallocate : arrêtée ET ressources libérées (pas facturée compute)."},
+{f:"Temporary Disk",b:"Stockage ÉPHÉMÈRE local. Perdu au deallocate/resize/maintenance. Jamais de données critiques !"},
+{f:"VM Availability",b:"Single VM Premium: 99.9%. Avail Set: 99.95% (FD max 3, UD max 20). Avail Zones: 99.99%."},
+{f:"VMSS",b:"Groupe VMs identiques + auto-scaling. Metric/Schedule rules. Cool-down 5min. Upgrade: Auto/Rolling/Manual."},
+{f:"App Service Slots",b:"Staging environments. Swap sans downtime. Sticky settings. Standard: 5 slots, Premium: 20."},
+{f:"ARM Complete vs Incremental",b:"Incremental (défaut) : ajoute. Complete : ajoute + SUPPRIME les absents du template !"},
+{f:"Custom Script Extension",b:"Exécute un script (PS/bash) après déploiement VM. Pour installer logiciels, configurer services."},
+{f:"ACI vs AKS vs Container Apps",b:"ACI : simple, 1 container. AKS : orchestration K8s, control plane gratuit. Container Apps : serverless, scale à 0."},
+{f:"Azure Migrate",b:"Découvrir, évaluer et migrer des serveurs on-prem vers Azure. Supporte VMware, Hyper-V, physical."},
+{f:"VNet Peering",b:"Backbone Azure, NON transitif, bilatéral, pas de chevauchement IP. Regional ou Global. Gateway Transit pour hub-spoke."},
+{f:"5 IP réservées/subnet",b:".0(réseau) .1(gateway) .2-.3(DNS) dernière(broadcast). /24=251, /27=27, /28=11 utilisables."},
+{f:"NSG Priorité",b:"100-4096, BAS = plus prioritaire. Défaut : 65000 AllowVnet, 65001 AllowLB/Internet, 65500 DenyAll."},
+{f:"NSG vs Azure Firewall",b:"NSG : L3/L4, basique, gratuit. Firewall : L3-L7, FQDN, threat intel, IDPS (Premium), payant."},
+{f:"Service EP vs Private EP",b:"Service: backbone Azure, IP publique, gratuit. Private: IP privée VNet, DNS privé, payant, accès on-prem."},
+{f:"Bastion",b:"RDP/SSH via HTTPS (443) dans le portail. Pas d'IP publique sur VM. AzureBastionSubnet /26 minimum."},
+{f:"UDR",b:"Route Table → subnet. Next hop : VNet, Virtual Appliance, Gateway, Internet, None. Forced tunneling : 0.0.0.0/0 → GW."},
+{f:"Application Gateway vs LB",b:"LB : L4 TCP/UDP. App GW : L7 HTTP/S, URL routing, SSL termination, WAF. Traffic Manager : DNS-based."},
+{f:"ExpressRoute",b:"Connexion privée dédiée, pas Internet. 50Mbps-100Gbps. Global Reach connecte 2 sites on-prem."},
+{f:"VPN S2S vs P2S",b:"S2S : réseau permanent IPsec, VPN device requis. P2S : 1 PC → VNet, OpenVPN/SSTP/IKEv2."},
+{f:"KQL Opérateurs",b:"where(filtre) project(colonnes) summarize(agrège) extend(calcul) join(joindre) render(graphique) take(limiter)."},
+{f:"Metrics vs Logs",b:"Metrics : numériques, temps réel, 93j. Logs : textuels, KQL, Log Analytics, 30-730j."},
+{f:"Alert Types",b:"Metric (CPU>90%), Log (KQL), Activity Log (ARM events), Service Health (pannes Azure)."},
+{f:"Action Group",b:"Actions sur alerte : Email, SMS, Webhook, Function, Logic App, Runbook, ITSM, Event Hub."},
+{f:"Autoscale",b:"VMSS/App Service. Rules : metric + schedule. Min/Max/Default instances. Cool-down 5min. Seuils in≠out !"},
+{f:"Advisor 5 catégories",b:"Reliability, Security, Performance, Cost, Operational Excellence."},
+{f:"Service Health 3 niveaux",b:"Azure Status (global), Service Health (tes services), Resource Health (1 ressource)."},
+{f:"Diagnostic Settings",b:"Par ressource → Log Analytics, Storage, Event Hub, Partner. Catégories de logs par type de ressource."},
+{f:"Activity Log",b:"Événements subscription (qui a fait quoi). 90 jours de rétention. Catégories : Admin, ServiceHealth, Security..."},
+{f:"AMA (Azure Monitor Agent)",b:"Nouvel agent unifié. Remplace MMA/Log Analytics Agent. Configuré via Data Collection Rules (DCR)."},
+{f:"ASR (Site Recovery)",b:"DR : réplique VMs vers autre région. Test failover sans impact prod. Recovery Plans pour orchestrer."},
+{f:"Recovery Services Vault",b:"Backups : VMs, SQL in VM, Azure Files. Backup policies : fréquence + rétention. MARS agent pour on-prem."},
+{f:"NAT Gateway",b:"IPs publiques dédiées pour trafic sortant. Évite épuisement ports SNAT du Load Balancer."},
+{f:"Virtual WAN",b:"Hub-spoke managé par Azure. Transitivité intégrée entre VNets. Combine S2S, P2S, ExpressRoute."},
+{f:"Stored Access Policy",b:"Politique nommée sur container/queue/table/share. Révoquer SAS sans régénérer clé. Max 5 par ressource."},
+{f:"Data Lake Gen2",b:"Blob Storage + Hierarchical Namespace. Performances analytics. ACLs POSIX. Endpoint .dfs.core.windows.net."}
+];
+
+// ═══════════ EXAM TIPS ═══════════
+const TIPS=[
+"L'examen dure ~120 min, 40-60 questions. Score passage ~700/1000 (~70%).",
+"Les case studies ne permettent PAS de revenir en arrière. Lis tout avant de répondre.",
+"NSG : connais les règles par défaut (65000, 65001, 65500) par cœur.",
+"RBAC : dessine la hiérarchie MG→Sub→RG→Resource et trace l'héritage.",
+"'Least cost' ou 'simplest' = souvent LRS, Basic tier, ou Free.",
+"PHS = TOUJOURS la réponse pour la méthode d'auth hybride la plus simple.",
+"Private Endpoint > Service Endpoint en sécurité.",
+"Tags NE SONT PAS hérités — piège classique.",
+"Temporary Disk = éphémère — question fréquente.",
+"ARM Complete mode SUPPRIME les absents — piège fréquent.",
+"Peering NON transitif — testé quasi systématiquement.",
+"Scale Out = horizontal (+instances). Scale Up = vertical (+taille).",
+"az vm stop ≠ az vm deallocate (stop = toujours facturé !).",
+"Conditional Access nécessite P1. Risk-based CA nécessite P2.",
+"User Delegation SAS = le plus sécurisé (Azure AD, blob uniquement).",
+"Security Defaults et Conditional Access = mutuellement exclusifs.",
+"Custom Script Extension = post-deployment script sur VM.",
+"Availability Zones 99.99% > Availability Set 99.95% > Single VM 99.9%.",
+"Key Vault : Purge Protection empêche la suppression définitive.",
+"Activity Log = 90 jours. Metrics = 93 jours.",
+"KQL : tu dois LIRE les requêtes, pas les écrire de mémoire.",
+"Global Admin ≠ Owner Azure. Il faut s'auto-élever.",
+"Storage account : 3-24 chars, lowercase + digits ONLY.",
+"Archive tier : réhydratation obligatoire, supporte seulement LRS/GRS/RA-GRS.",
+"Azure Firewall Premium : TLS inspection + IDPS.",
+"AKS control plane = GRATUIT. Tu payes les worker nodes.",
+"LRS→ZRS = live migration ou copie manuelle.",
+"NSG subnet + NSG NIC : trafic doit être Allow par les DEUX.",
+"Azure Monitor Agent (AMA) remplace MMA — c'est le futur.",
+"Autoscale : seuils scale-in ≠ scale-out pour éviter le flapping."
+];
+
+// ═══════════════════ STYLES ═══════════════════
+const S=`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--b0:#060a12;--b1:#0c1322;--b2:#131d33;--b3:#1a2744;--b4:#223357;--t1:#f0f4f8;--t2:#8fa3bf;--t3:#5a7190;--bd:#192a45;--ac:#3b82f6;--ag:rgba(59,130,246,.1);--ok:#22c55e;--er:#ef4444;--wa:#eab308;--pu:#a855f7}
+body,html,#root{width:100%;height:100%;font-family:'Outfit',sans-serif;background:var(--b0);color:var(--t1);overflow:hidden}
+.A{display:flex;height:100vh}
+.S{width:250px;min-width:250px;background:var(--b1);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bd) transparent}
+.S::-webkit-scrollbar{width:3px}.S::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+.Sh{padding:16px 14px;border-bottom:1px solid var(--bd)}
+.Sb{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ac);letter-spacing:2px;text-transform:uppercase}
+.St{font-size:18px;font-weight:800;background:linear-gradient(135deg,#3b82f6,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:2px 0}
+.Ss{font-size:9px;color:var(--t3)}
+.Sn{padding:6px;flex:1}
+.Sc{font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--t3);letter-spacing:2px;text-transform:uppercase;padding:12px 8px 4px}
+.Si{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:500;color:var(--t2);transition:all .12s}
+.Si:hover{background:var(--b2);color:var(--t1)}.Si.a{background:var(--ag);color:var(--ac);font-weight:600}
+.Sk{font-size:14px;width:20px;text-align:center}.Sw{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--t3);background:var(--b0);padding:1px 4px;border-radius:2px}
+.Sp{padding:12px 14px;border-top:1px solid var(--bd)}
+.Sl{font-size:9px;color:var(--t3);display:flex;justify-content:space-between;margin-bottom:4px}
+.Pg{height:4px;background:var(--b0);border-radius:2px;overflow:hidden}.Pf{height:100%;background:linear-gradient(90deg,var(--ac),var(--pu));border-radius:2px;transition:width .4s}
+.M{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bd) transparent}.M::-webkit-scrollbar{width:5px}.M::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+.C{max-width:840px;margin:0 auto;padding:32px 36px 50px}
+.dh{font-size:11px;color:var(--t3);font-family:'IBM Plex Mono',monospace;letter-spacing:1px;margin-bottom:4px}
+.dt{font-size:26px;font-weight:800;margin-bottom:4px}
+.dd{font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:24px}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+.sc{background:var(--b2);border:1px solid var(--bd);border-radius:10px;padding:14px;transition:all .15s}
+.sc:hover{border-color:var(--ac);transform:translateY(-1px)}
+.sv{font-size:22px;font-weight:700;margin-bottom:1px}.sl{font-size:10px;color:var(--t3)}
+.mg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:24px}
+.mc{background:var(--b2);border:1px solid var(--bd);border-radius:12px;padding:16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.mc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--cc)}
+.mc:hover{border-color:var(--cc);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.mh{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.mi{font-size:20px}.mt{font-size:13px;font-weight:700}
+.mw{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--t3);margin-bottom:8px}
+.ms{display:flex;gap:12px;font-size:10px;color:var(--t2);margin-bottom:8px}
+.tb{background:var(--b2);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-top:20px}
+.tbt{font-size:12px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.tp{font-size:11px;color:var(--t2);line-height:1.5;padding:6px 0;border-bottom:1px solid var(--bd)}.tp:last-child{border:0}
+.lh{margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--bd)}
+.lb{font-size:10px;color:var(--t3);margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.lb span{cursor:pointer}.lb span:hover{color:var(--ac)}
+.lt{font-size:22px;font-weight:700}
+.ts{display:flex;gap:2px;margin-bottom:16px;background:var(--b1);padding:2px;border-radius:6px;width:fit-content}
+.t{padding:6px 14px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;color:var(--t2);border:none;background:transparent;font-family:inherit;transition:all .12s}
+.t.a{background:var(--ac);color:#fff}.t:hover:not(.a){color:var(--t1);background:var(--b2)}
+.ln{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}
+.nb{padding:4px 10px;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--b2);color:var(--t2);font-family:inherit;transition:all .12s}
+.nb.a{border-color:var(--ac);color:var(--ac);background:var(--ag)}.nb:hover:not(.a){border-color:var(--t3);color:var(--t1)}
+.pb{background:var(--b2);border:1px solid var(--bd);border-radius:8px;padding:16px;margin-bottom:8px;white-space:pre-wrap;font-size:12px;line-height:1.7;color:var(--t2)}
+.pb strong{color:var(--t1);font-weight:600}
+.cb{background:var(--b0);border:1px solid var(--bd);border-radius:6px;padding:14px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;overflow-x:auto;margin:8px 0;color:var(--pu)}
+.qb{display:flex;gap:2px;margin-bottom:20px}.qd{flex:1;height:3px;border-radius:1px;background:var(--b2);transition:all .2s}.qd.ok{background:var(--ok)}.qd.bad{background:var(--er)}.qd.cur{background:var(--ac)}
+.qn{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ac);margin-bottom:4px}
+.qq{font-size:16px;font-weight:700;line-height:1.3;margin-bottom:16px}
+.qo{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.qp{padding:12px 14px;border-radius:8px;border:1px solid var(--bd);background:var(--b2);cursor:pointer;font-size:12px;transition:all .12s;display:flex;align-items:center;gap:10px}
+.qp:hover:not(.ds){border-color:var(--ac);background:var(--ag)}
+.qp.sl{border-color:var(--ac);background:var(--ag)}.qp.ok{border-color:var(--ok);background:rgba(34,197,94,.06)}.qp.bad{border-color:var(--er);background:rgba(239,68,68,.06)}
+.qp.ds{cursor:default;opacity:.5}.qp.ds.ok{opacity:1}
+.ql{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px;background:var(--b0);color:var(--t3);flex-shrink:0}
+.qp.ok .ql{background:var(--ok);color:#fff}.qp.bad .ql{background:var(--er);color:#fff}
+.qe{background:var(--b2);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:12px;font-size:12px;line-height:1.5;color:var(--t2)}
+.qet{font-weight:700;color:var(--t1);margin-bottom:4px}
+.rs{text-align:center;padding:28px 0}.rv{font-size:50px;font-weight:700;margin-bottom:4px}.rl{font-size:13px;color:var(--t2);margin-bottom:16px}.rm{font-size:15px;font-weight:600;margin-bottom:24px}
+.btn{padding:7px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .12s}
+.bp{background:var(--ac);color:#fff}.bp:hover{background:#2563eb}.bs{background:var(--b2);color:var(--t2);border:1px solid var(--bd)}.bs:hover{border-color:var(--t3);color:var(--t1)}
+.bg{display:flex;gap:6px;flex-wrap:wrap}
+.fcc{display:flex;flex-direction:column;align-items:center;padding:12px 0}
+.fcn{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--t3);margin-bottom:12px}
+.fc{width:100%;max-width:480px;min-height:240px;perspective:1000px;cursor:pointer;margin-bottom:16px}
+.fi{width:100%;min-height:240px;position:relative;transition:transform .5s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}.fi.fl{transform:rotateY(180deg)}
+.ff{width:100%;min-height:240px;position:absolute;top:0;backface-visibility:hidden;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center}
+.fr{background:linear-gradient(135deg,var(--b2),var(--b1));border:1px solid var(--bd)}
+.fk{background:linear-gradient(135deg,#1a2744,#0f1a2e);border:1px solid var(--ac);transform:rotateY(180deg)}
+.fl2{font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--t3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.ft{font-size:16px;font-weight:700;line-height:1.2}.fa{font-size:13px;line-height:1.6;color:var(--t2)}
+.fh{font-size:10px;color:var(--t3);margin-top:10px}
+.fcs{display:flex;gap:8px;align-items:center}
+.fb{width:38px;height:38px;border-radius:50%;border:1px solid var(--bd);background:var(--b2);color:var(--t2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .12s}
+.fb:hover{border-color:var(--ac);color:var(--ac)}.fb:disabled{opacity:.25;cursor:default}
+.eh{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:12px 16px;background:var(--b2);border-radius:8px;border:1px solid var(--bd)}
+.et{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:var(--wa)}.ei{font-size:11px;color:var(--t2)}
+.ri{padding:10px 12px;background:var(--b2);border-radius:8px;margin-bottom:6px;font-size:11px}
+.rn{font-size:9px;color:var(--t3);font-family:'IBM Plex Mono',monospace;margin-bottom:2px}
+.mh2{display:none;padding:8px 12px;background:var(--b1);border-bottom:1px solid var(--bd);align-items:center;gap:8px}
+.hm{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:5px;border:1px solid var(--bd);background:transparent;color:var(--t1);cursor:pointer;font-size:14px}
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90}
+@media(max-width:768px){.S{position:fixed;left:-270px;top:0;bottom:0;z-index:100;transition:left .25s}.S.o{left:0}.ov.sh{display:block}.mh2{display:flex}.C{padding:16px 14px}.sg{grid-template-columns:repeat(2,1fr)}.mg{grid-template-columns:1fr}}`;
+
+function rc(t){const l=t.split('\n');let r=[],b='';for(let i=0;i<l.length;i++){if(l[i].trimStart().startsWith('```')){if(b){r.push(b);b=''}let c='';i++;while(i<l.length&&!l[i].trimStart().startsWith('```')){c+=l[i]+'\n';i++}r.push({t:'c',c:c.trim()})}else b+=l[i]+'\n'}if(b)r.push(b);return r.map((x,i)=>{if(typeof x==='object')return <pre key={i} className="cb">{x.c}</pre>;const p=x.split(/(\*\*[^*]+\*\*)/g);return <div key={i} className="pb">{p.map((s,j)=>s.startsWith('**')&&s.endsWith('**')?<strong key={j}>{s.slice(2,-2)}</strong>:<span key={j}>{s}</span>)}</div>})}
+
+function sh(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r}
+
+function App(){
+const[v,sV]=useState('d');
+const[m,sM]=useState(null);
+const[ls,sLs]=useState(0);
+const[tb,sTb]=useState('l');
+const[so,sSo]=useState(false);
+const[qi,sQi]=useState(0);
+const[sa,sSa]=useState(null);
+const[se,sSe]=useState(false);
+const[qr,sQr]=useState([]);
+const[qd,sQd]=useState(false);
+const[fi,sFi]=useState(0);
+const[ff,sFf]=useState(false);
+const[fo,sFo]=useState(()=>sh(FC.map((_,i)=>i)));
+const[eq,sEq]=useState([]);
+const[ei,sEi]=useState(0);
+const[ea,sEa]=useState({});
+const[ed,sEd]=useState(false);
+const[et,sEt]=useState(0);
+const er=useRef(null);
+const[dn,sDn]=useState({});
+const[sc,sSc]=useState({});
+const[ti]=useState(()=>Math.floor(Math.random()*(TIPS.length-5)));
+
+const tl=MODULES.reduce((a,x)=>a+x.lessons.length,0);
+const dc=Object.keys(dn).length;
+const tq=MODULES.reduce((a,x)=>a+x.quizzes.length,0);
+const ps=Object.values(sc).filter(s=>s>=70).length;
+
+const om=(x)=>{sM(x);sLs(0);sTb('l');sV('m');rq();sSo(false)};
+const rq=()=>{sQi(0);sSa(null);sSe(false);sQr([]);sQd(false)};
+
+const aq=(i)=>{if(se)return;sSa(i);sSe(true);sQr(p=>[...p,i===m.quizzes[qi].correct])};
+const nq=()=>{if(qi+1>=m.quizzes.length){sQd(true);const c=qr.filter(Boolean).length;const s=Math.round((c/m.quizzes.length)*100);sSc(p=>({...p,[m.id]:Math.max(p[m.id]||0,s)}))}else{sQi(p=>p+1);sSa(null);sSe(false)}};
+
+const sx=()=>{const a=[];MODULES.forEach(x=>x.quizzes.forEach(q=>a.push({...q,mod:x.title})));sEq(sh(a).slice(0,Math.min(45,a.length)));sEi(0);sEa({});sEd(false);sEt(0);sV('e');sSo(false);if(er.current)clearInterval(er.current);er.current=setInterval(()=>sEt(t=>t+1),1000)};
+const fe=()=>{if(er.current)clearInterval(er.current);sEd(true)};
+useEffect(()=>()=>{if(er.current)clearInterval(er.current)},[]);
+const fmt=(s)=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+const esc=ed?eq.reduce((a,q,i)=>a+(ea[i]===q.correct?1:0),0):0;
+
+return(<><style>{S}</style><div className="A">
+<div className="mh2"><button className="hm" onClick={()=>sSo(!so)}>☰</button><span style={{fontWeight:700,fontSize:12}}>AZ-104 Study Hub</span></div>
+<div className={`ov ${so?'sh':''}`} onClick={()=>sSo(false)}/>
+<div className={`S ${so?'o':''}`}>
+<div className="Sh"><div className="Sb">Microsoft Azure</div><div className="St">AZ-104</div><div className="Ss">Administrator Associate — Exam Ready</div></div>
+<div className="Sn">
+<div className="Si" onClick={()=>{sV('d');sM(null);sSo(false)}}><span className="Sk">🏠</span>Dashboard</div>
+<div className="Sc">Modules ({tl} leçons)</div>
+{MODULES.map(x=><div key={x.id} className={`Si ${m?.id===x.id&&v==='m'?'a':''}`} onClick={()=>om(x)}><span className="Sk">{x.icon}</span><span style={{flex:1,fontSize:11}}>{x.title}</span><span className="Sw">{x.weight}</span></div>)}
+<div className="Sc">Outils</div>
+<div className={`Si ${v==='f'?'a':''}`} onClick={()=>{sV('f');sFi(0);sFf(false);sSo(false)}}><span className="Sk">🃏</span>Flashcards ({FC.length})</div>
+<div className={`Si ${v==='e'?'a':''}`} onClick={sx}><span className="Sk">🎯</span>Examen blanc (45Q)</div>
+</div>
+<div className="Sp"><div className="Sl"><span>Progression</span><span>{tl>0?Math.round((dc/tl)*100):0}%</span></div><div className="Pg"><div className="Pf" style={{width:`${tl>0?(dc/tl)*100:0}%`}}/></div></div>
+</div>
+<div className="M">
+{/* DASHBOARD */}
+{v==='d'&&<div className="C">
+<div className="dh">// PLATEFORME D'ÉTUDE COMPLÈTE</div>
+<div className="dt">AZ-104 Study Hub</div>
+<div className="dd">{tl} leçons détaillées, {tq} questions de quiz, {FC.length} flashcards, examens blancs chronométrés et {TIPS.length} tips d'examen. Tout le contenu nécessaire pour passer la certification.</div>
+<div className="sg">
+<div className="sc"><div className="sv" style={{color:'var(--ac)'}}>{dc}/{tl}</div><div className="sl">Leçons terminées</div></div>
+<div className="sc"><div className="sv" style={{color:'var(--ok)'}}>{ps}/{MODULES.length}</div><div className="sl">Quiz réussis (≥70%)</div></div>
+<div className="sc"><div className="sv" style={{color:'var(--pu)'}}>{FC.length}</div><div className="sl">Flashcards</div></div>
+<div className="sc"><div className="sv" style={{color:'var(--wa)'}}>{tq}</div><div className="sl">Questions quiz</div></div>
+</div>
+<div className="Sc" style={{padding:'0 0 8px'}}>MODULES</div>
+<div className="mg">{MODULES.map(x=>{const mc=x.lessons.filter((_,i)=>dn[`${x.id}-${i}`]).length;const s=sc[x.id];return(<div key={x.id} className="mc" style={{'--cc':x.color}} onClick={()=>om(x)}><div className="mh"><span className="mi">{x.icon}</span><span className="mt">{x.title}</span></div><div className="mw">Poids : {x.weight}</div><div className="ms"><span>📖 {x.lessons.length} leçons</span><span>❓ {x.quizzes.length} questions</span>{s!==undefined&&<span style={{color:s>=70?'var(--ok)':'var(--er)'}}>Score: {s}%</span>}</div><div className="Pg"><div className="Pf" style={{width:`${(mc/x.lessons.length)*100}%`,background:x.color}}/></div></div>)})}</div>
+<div className="tb"><div className="tbt">💡 Tips d'examen</div>{TIPS.slice(ti,ti+6).map((t,i)=><div key={i} className="tp">→ {t}</div>)}</div>
+</div>}
+
+{/* MODULE */}
+{v==='m'&&m&&<div className="C">
+<div className="lh"><div className="lb"><span onClick={()=>{sV('d');sM(null)}}>Accueil</span><span style={{color:'var(--t3)'}}>›</span><span style={{color:m.color}}>{m.icon} {m.title}</span></div><div className="lt">{m.title}</div></div>
+<div className="ts"><button className={`t ${tb==='l'?'a':''}`} onClick={()=>sTb('l')}>📖 Cours ({m.lessons.length})</button><button className={`t ${tb==='q'?'a':''}`} onClick={()=>{sTb('q');rq()}}>❓ Quiz ({m.quizzes.length}Q)</button></div>
+{tb==='l'&&<><div className="ln">{m.lessons.map((l,i)=><button key={i} className={`nb ${ls===i?'a':''}`} onClick={()=>sLs(i)}>{dn[`${m.id}-${i}`]?'✅ ':''}{i+1}. {l.title}</button>)}</div>
+<div className="prose">{rc(m.lessons[ls].content)}</div>
+<div style={{marginTop:16}}><div className="bg"><button className="btn bp" onClick={()=>{sDn(p=>({...p,[`${m.id}-${ls}`]:true}));if(ls+1<m.lessons.length)sLs(ls+1)}}>{dn[`${m.id}-${ls}`]?'✅ Complété':'✓ Lu'}{ls+1<m.lessons.length?' → Suivant':''}</button>{ls+1>=m.lessons.length&&<button className="btn bs" onClick={()=>{sTb('q');rq()}}>Passer au Quiz →</button>}</div></div></>}
+{tb==='q'&&!qd&&<div style={{maxWidth:660}}>
+<div className="qb">{m.quizzes.map((_,i)=><div key={i} className={`qd ${i<qi?(qr[i]?'ok':'bad'):i===qi?'cur':''}`}/>)}</div>
+<div className="qn">Question {qi+1} / {m.quizzes.length}</div>
+<div className="qq">{m.quizzes[qi].q}</div>
+<div className="qo">{m.quizzes[qi].options.map((o,i)=>{let c='qp';if(se){c+=' ds';if(i===m.quizzes[qi].correct)c+=' ok';else if(i===sa)c+=' bad'}else if(sa===i)c+=' sl';return<div key={i} className={c} onClick={()=>aq(i)}><span className="ql">{'ABCD'[i]}</span><span>{o}</span></div>})}</div>
+{se&&<><div className="qe"><div className="qet">{sa===m.quizzes[qi].correct?'✅ Correct !':'❌ Incorrect'}</div>{m.quizzes[qi].explanation}</div><button className="btn bp" onClick={nq}>{qi+1>=m.quizzes.length?'Voir les résultats':'Suivante →'}</button></>}
+</div>}
+{tb==='q'&&qd&&<div className="rs">
+<div className="rv" style={{color:(qr.filter(Boolean).length/qr.length)>=.7?'var(--ok)':'var(--er)'}}>{Math.round((qr.filter(Boolean).length/qr.length)*100)}%</div>
+<div className="rl">{qr.filter(Boolean).length}/{qr.length} bonnes réponses</div>
+<div className="rm">{(qr.filter(Boolean).length/qr.length)>=.7?'🎉 Module maîtrisé !':'📚 Continue à réviser !'}</div>
+<div className="bg" style={{justifyContent:'center'}}><button className="btn bp" onClick={rq}>Refaire</button><button className="btn bs" onClick={()=>sTb('l')}>Revoir le cours</button></div>
+</div>}
+</div>}
+
+{/* FLASHCARDS */}
+{v==='f'&&<div className="C">
+<div className="lh"><div className="lb"><span onClick={()=>sV('d')}>Accueil</span><span style={{color:'var(--t3)'}}>›</span><span style={{color:'var(--wa)'}}>🃏 Flashcards</span></div><div className="lt">Flashcards AZ-104 ({FC.length} cartes)</div></div>
+<div className="fcc">
+<div className="fcn">{fi+1} / {FC.length}</div>
+<div className="fc" onClick={()=>sFf(!ff)}><div className={`fi ${ff?'fl':''}`}><div className="ff fr"><div className="fl2">Concept</div><div className="ft">{FC[fo[fi]].f}</div><div className="fh">Clique pour retourner</div></div><div className="ff fk"><div className="fl2">Réponse</div><div className="fa">{FC[fo[fi]].b}</div></div></div></div>
+<div className="fcs"><button className="fb" disabled={fi===0} onClick={()=>{sFf(false);sFi(fi-1)}}>←</button><button className="fb" onClick={()=>{sFo(sh(FC.map((_,i)=>i)));sFi(0);sFf(false)}} style={{fontSize:12}}>🔀</button><button className="fb" disabled={fi===FC.length-1} onClick={()=>{sFf(false);sFi(fi+1)}}>→</button></div>
+</div></div>}
+
+{/* EXAM */}
+{v==='e'&&eq.length>0&&(ed?<div className="C"><div className="rs">
+<div className="rv" style={{color:Math.round((esc/eq.length)*100)>=70?'var(--ok)':'var(--er)'}}>{Math.round((esc/eq.length)*100)}%</div>
+<div className="rl">{esc}/{eq.length} bonnes réponses en {fmt(et)}</div>
+<div className="rm">{Math.round((esc/eq.length)*100)>=70?'🎉 Tu aurais réussi !':'📚 Seuil ~70%. Continue !'}</div>
+<div style={{textAlign:'left',marginTop:20}}>{eq.map((q,i)=>{const ok=ea[i]===q.correct;return<div key={i} className="ri" style={{borderLeft:`3px solid ${ok?'var(--ok)':'var(--er)'}`}}><div className="rn">{q.mod}</div><div style={{fontWeight:600,fontSize:11}}>{ok?'✅':'❌'} {q.q}</div>{!ok&&<div style={{fontSize:10,color:'var(--t2)'}}>Réponse : <strong style={{color:'var(--ok)'}}>{q.options[q.correct]}</strong>{ea[i]!=null&&<span> — Toi : {q.options[ea[i]]}</span>}</div>}</div>})}</div>
+<div className="bg" style={{justifyContent:'center',marginTop:16}}><button className="btn bp" onClick={sx}>Nouvel examen</button><button className="btn bs" onClick={()=>sV('d')}>Retour</button></div>
+</div></div>:
+<div className="C">
+<div className="eh"><div className="ei">Question {ei+1}/{eq.length}</div><div className="et">⏱ {fmt(et)}</div></div>
+<div style={{maxWidth:660}}>
+<div className="qb">{eq.map((_,i)=><div key={i} className={`qd ${ea[i]!=null?'ok':''} ${i===ei?'cur':''}`}/>)}</div>
+<div style={{fontSize:9,color:'var(--t3)',marginBottom:4,fontFamily:"'IBM Plex Mono',monospace"}}>{eq[ei].mod}</div>
+<div className="qq">{eq[ei].q}</div>
+<div className="qo">{eq[ei].options.map((o,i)=><div key={i} className={`qp ${ea[ei]===i?'sl':''}`} onClick={()=>sEa(p=>({...p,[ei]:i}))}><span className="ql">{'ABCD'[i]}</span><span>{o}</span></div>)}</div>
+<div className="bg">{ei>0&&<button className="btn bs" onClick={()=>sEi(ei-1)}>←</button>}{ei<eq.length-1?<button className="btn bp" onClick={()=>sEi(ei+1)}>→</button>:<button className="btn bp" style={{background:'var(--ok)'}} onClick={fe}>✓ Terminer</button>}</div>
+</div></div>)}
+</div></div></>)
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(App));
+</script>
+</body>
+</html>
